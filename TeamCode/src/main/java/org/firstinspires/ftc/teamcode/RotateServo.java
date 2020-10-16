@@ -30,14 +30,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 
 /**
@@ -55,7 +52,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Autonomous(name="Forward", group="Linear Opmode")
 //@Disabled
-public class Forward extends LinearOpMode {
+public class RotateServo extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -67,7 +64,9 @@ public class Forward extends LinearOpMode {
 
     double power = 0.0;
 
-    Servo  servoPlacer;
+    //servo
+    Servo  servo;
+    double servoPosition = 0.0;
 
     @Override
     public void runOpMode() {
@@ -99,7 +98,8 @@ public class Forward extends LinearOpMode {
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //ServoHardwareMapping
-        servoPlacer = hardwareMap.servo.get("Placer");
+        servo = hardwareMap.servo.get("servo");
+        servo.setPosition(servoPosition);
 
 
         waitForStart();
@@ -156,7 +156,15 @@ public class Forward extends LinearOpMode {
         leftRear.setPower(power);
         rightFront.setPower(power);
         rightRear.setPower(power);
-    }
 
+        //set position of robot
+
+        servoPosition = 0.5;
+        servo.setPosition(servoPosition);
+        sleep(2000);
+        servoPosition = 1.0;
+        servo.setPosition(servoPosition);
+    }
+    
 
 }
