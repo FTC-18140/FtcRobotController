@@ -53,7 +53,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Forward", group="Linear Opmode")
+//@Autonomous(name="Forward", group="Linear Opmode")
 //@Disabled
 public class Forward extends LinearOpMode {
 
@@ -67,7 +67,8 @@ public class Forward extends LinearOpMode {
 
     double power = 0.0;
 
-    Servo  servoPlacer;
+  //  Servo  servo;
+    //double servoPosition = 0.0;
 
     @Override
     public void runOpMode() {
@@ -99,7 +100,8 @@ public class Forward extends LinearOpMode {
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //ServoHardwareMapping
-        servoPlacer = hardwareMap.servo.get("Placer");
+     //   servo = hardwareMap.servo.get("servo");
+       // servo.setPosition(servoPosition);
 
 
         waitForStart();
@@ -156,6 +158,17 @@ public class Forward extends LinearOpMode {
         leftRear.setPower(power);
         rightFront.setPower(power);
         rightRear.setPower(power);
+
+        //set position of robot
+/*
+        servoPosition = 0.5;
+        servo.setPosition(servoPosition);
+        sleep(2000);
+        servoPosition = 0.0;
+        servo.setPosition(servoPosition);
+*/
+
+
     }
 
 
