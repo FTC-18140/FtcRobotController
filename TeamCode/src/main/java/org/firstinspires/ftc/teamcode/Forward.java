@@ -58,6 +58,7 @@ public class Forward extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
+    static final int MOTOR_TICK_COUNTS = 1440;
 
     DcMotor leftFront = null;
     DcMotor rightFront = null;
@@ -149,5 +150,43 @@ public class Forward extends LinearOpMode {
         leftRear.setPower(power);
         rightFront.setPower(power);
         rightRear.setPower(power);
+
+
+        // moving to an exact length
+        // there is an error with the "robot" probably because it hasn't been defined
+        double circumference = 3.14 * 4; // pi times diameter
+        double rotationsNeeded = 1/circumference; // the distance wanted to be traveled divided by the circumference of the wheel
+        int encoderDrivingTarget = (int)(rotationsNeeded * 1440); // 1440 equals ticks
+
+        robot.leftfront.setTargetPosition(encoderDrivingTarget);
+        robot.leftRear.setTargetPosition(encoderDrivingTarget);
+        robot.rightfront.setTargetPosition(encoderDrivingTarget);
+        robot.rightRear.setTargetPosition(encoderDrivingTarget);
+
+        //setting power
+        power = 0.5;
+        leftFront.setPower(power);
+        leftRear.setPower(power);
+        rightFront.setPower(power);
+        rightRear.setPower(power);
+
+        // set the motors to RUN_TO_POSITION
+        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // checking to see if the motors are busy
+        while (robot.leftFront.isBusy() || robot.leftRear.isBusy() || robot.rightFront.isBusy() || robot.rightRear.isBusy()) {
+            telemetry.addData("paths", "complete");
+            telemetry.update();
+        }
+        // stop
+        power = 0;
+        leftFront.setPower(power);
+        leftRear.setPower(power);
+        rightFront.setPower(power);
+        rightRear.setPower(power);
+
     }
 }
