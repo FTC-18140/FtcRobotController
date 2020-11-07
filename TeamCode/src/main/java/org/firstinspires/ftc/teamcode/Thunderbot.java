@@ -32,14 +32,10 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 <<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/cmdThunderbot.java
 =======
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 >>>>>>> Placer:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Forward.java
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * This is NOT an opmode.
@@ -58,7 +54,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Servo channel:  Servo to open right claw: "right_hand"
  */
 <<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/cmdThunderbot.java
-public class cmdThunderbot
+public class Thunderbot
 {
     /* Public OpMode members. */
 =======
@@ -80,7 +76,7 @@ public class Forward extends LinearOpMode {
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
 
-<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/cmdThunderbot.java
+<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Thunderbot.java
     /* Constructor */
     public cmdThunderbot(){
     }
@@ -127,7 +123,7 @@ public class Forward extends LinearOpMode {
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/cmdThunderbot.java
+<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/ Thunderbot.java
     }
  }
 

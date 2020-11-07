@@ -30,12 +30,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
@@ -69,7 +66,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
     /* Declare OpMode members. */
-    cmdThunderbot         robot   = new cmdThunderbot();   // Use a Thunderbot's hardware
+    Thunderbot robot   = new Thunderbot();   // Use a Thunderbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
     static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // eg: neverrest 40 Motor Encoder
