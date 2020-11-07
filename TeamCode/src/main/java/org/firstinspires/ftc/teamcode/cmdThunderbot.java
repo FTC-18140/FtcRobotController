@@ -30,6 +30,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/cmdThunderbot.java
+=======
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+>>>>>>> Placer:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Forward.java
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -51,9 +57,20 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Servo channel:  Servo to open left claw:  "left_hand"
  * Servo channel:  Servo to open right claw: "right_hand"
  */
+<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/cmdThunderbot.java
 public class cmdThunderbot
 {
     /* Public OpMode members. */
+=======
+
+//@Autonomous(name="Forward", group="Linear Opmode")
+//@Disabled
+public class Forward extends LinearOpMode {
+
+    // Declare OpMode members.
+    private ElapsedTime runtime = new ElapsedTime();
+
+>>>>>>> Placer:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Forward.java
     DcMotor leftFront = null;
     DcMotor rightFront = null;
     DcMotor leftRear = null;
@@ -63,6 +80,7 @@ public class cmdThunderbot
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
 
+<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/cmdThunderbot.java
     /* Constructor */
     public cmdThunderbot(){
     }
@@ -71,6 +89,15 @@ public class cmdThunderbot
     public void init(HardwareMap ahwMap) {
         // Save reference to Hardware map
         hwMap = ahwMap;
+=======
+  //  Servo  servo;
+    //double servoPosition = 0.0;
+
+    @Override
+    public void runOpMode() {
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+>>>>>>> Placer:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Forward.java
 
         // Define and Initialize Motors
  //       telemetry.addData("Status", "Initialized");
@@ -100,6 +127,83 @@ public class cmdThunderbot
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/cmdThunderbot.java
     }
  }
 
+=======
+        //ServoHardwareMapping
+     //   servo = hardwareMap.servo.get("servo");
+       // servo.setPosition(servoPosition);
+
+
+        waitForStart();
+        runtime.reset();
+
+        //move backwards
+
+        power = 0.5;
+
+        leftFront.setPower(power);
+        leftRear.setPower(power);
+        rightFront.setPower(power);
+        rightRear.setPower(power);
+
+        //robot pauses for 1 second before next step
+        sleep(1000);
+
+        //stop the robot
+
+        power = 0.00;
+
+        leftFront.setPower(power);
+        leftRear.setPower(power);
+        rightFront.setPower(power);
+        rightRear.setPower(power);
+
+        sleep(2000);
+
+        //turn left
+        power = 0.2;
+
+        leftFront.setPower(-power);
+        leftRear.setPower(-power);
+        rightFront.setPower(power);
+        rightRear.setPower(power);
+
+        sleep(500);
+
+        //move forwards
+        power = -0.5;
+
+        leftFront.setPower(power);
+        leftRear.setPower(power);
+        rightFront.setPower(power);
+        rightRear.setPower(power);
+
+        sleep(1000);
+
+        //stop the robot
+
+        power = 0.00;
+
+        leftFront.setPower(power);
+        leftRear.setPower(power);
+        rightFront.setPower(power);
+        rightRear.setPower(power);
+
+        //set position of robot
+/*
+        servoPosition = 0.5;
+        servo.setPosition(servoPosition);
+        sleep(2000);
+        servoPosition = 0.0;
+        servo.setPosition(servoPosition);
+*/
+
+
+    }
+
+
+}
+>>>>>>> Placer:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Forward.java
