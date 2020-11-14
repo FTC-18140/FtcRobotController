@@ -30,10 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/cmdThunderbot.java
-=======
 import com.qualcomm.robotcore.util.ElapsedTime;
->>>>>>> Placer:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Forward.java
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -41,32 +38,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * This is NOT an opmode.
  *
  * This class can be used to define all the specific hardware for a single robot.
- * In this case that robot is a Pushbot.
+ * In this case that robot is a Thunderbot.
  * See PushbotTeleopTank_Iterative and others classes starting with "Pushbot" for usage examples.
- *
- * This hardware class assumes the following device names have been configured on the robot:
- * Note:  All names are lower case and some have single spaces between words.
- *
- * Motor channel:  Left  drive motor:        "left_drive"
- * Motor channel:  Right drive motor:        "right_drive"
- * Motor channel:  Manipulator drive motor:  "left_arm"
- * Servo channel:  Servo to open left claw:  "left_hand"
- * Servo channel:  Servo to open right claw: "right_hand"
  */
-<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/cmdThunderbot.java
+
 public class Thunderbot
 {
     /* Public OpMode members. */
-=======
-
-//@Autonomous(name="Forward", group="Linear Opmode")
-//@Disabled
-public class Forward extends LinearOpMode {
-
-    // Declare OpMode members.
-    private ElapsedTime runtime = new ElapsedTime();
-
->>>>>>> Placer:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Forward.java
     DcMotor leftFront = null;
     DcMotor rightFront = null;
     DcMotor leftRear = null;
@@ -76,29 +54,17 @@ public class Forward extends LinearOpMode {
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
 
-<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Thunderbot.java
     /* Constructor */
-    public cmdThunderbot(){
+    public Thunderbot(){
+
     }
 
     /* Initialize standard Hardware interfaces */
     public void init(HardwareMap ahwMap) {
         // Save reference to Hardware map
         hwMap = ahwMap;
-=======
-  //  Servo  servo;
-    //double servoPosition = 0.0;
 
-    @Override
-    public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
->>>>>>> Placer:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Forward.java
-
-        // Define and Initialize Motors
- //       telemetry.addData("Status", "Initialized");
-   //     telemetry.update();
-
+        //Define & Initialize Motors
         rightFront = hwMap.dcMotor.get("rightFront");
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -123,83 +89,5 @@ public class Forward extends LinearOpMode {
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/ Thunderbot.java
     }
- }
-
-=======
-        //ServoHardwareMapping
-     //   servo = hardwareMap.servo.get("servo");
-       // servo.setPosition(servoPosition);
-
-
-        waitForStart();
-        runtime.reset();
-
-        //move backwards
-
-        power = 0.5;
-
-        leftFront.setPower(power);
-        leftRear.setPower(power);
-        rightFront.setPower(power);
-        rightRear.setPower(power);
-
-        //robot pauses for 1 second before next step
-        sleep(1000);
-
-        //stop the robot
-
-        power = 0.00;
-
-        leftFront.setPower(power);
-        leftRear.setPower(power);
-        rightFront.setPower(power);
-        rightRear.setPower(power);
-
-        sleep(2000);
-
-        //turn left
-        power = 0.2;
-
-        leftFront.setPower(-power);
-        leftRear.setPower(-power);
-        rightFront.setPower(power);
-        rightRear.setPower(power);
-
-        sleep(500);
-
-        //move forwards
-        power = -0.5;
-
-        leftFront.setPower(power);
-        leftRear.setPower(power);
-        rightFront.setPower(power);
-        rightRear.setPower(power);
-
-        sleep(1000);
-
-        //stop the robot
-
-        power = 0.00;
-
-        leftFront.setPower(power);
-        leftRear.setPower(power);
-        rightFront.setPower(power);
-        rightRear.setPower(power);
-
-        //set position of robot
-/*
-        servoPosition = 0.5;
-        servo.setPosition(servoPosition);
-        sleep(2000);
-        servoPosition = 0.0;
-        servo.setPosition(servoPosition);
-*/
-
-
-    }
-
-
 }
->>>>>>> Placer:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Forward.java

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import static java.lang.Math.abs;
 
 @TeleOp(name="Teleop", group="Teleop")
+//@Disabled
 public class Teleop extends OpMode
 {
     DcMotor leftFront = null;
@@ -78,6 +80,7 @@ public class Teleop extends OpMode
             leftRear = null;
         }
 
+
         intake = hardwareMap.dcMotor.get("intake");
         intake.setDirection(DcMotorSimple.Direction.FORWARD);
         //ServoHardwareMapping
@@ -97,11 +100,11 @@ public class Teleop extends OpMode
 
 
 
+
     public void start(){}
 
     public void loop()
     {
-
 
         //joystick values x and y on left stick; x only on right stick
         double forward = gamepad1.left_stick_y;     // push left joystick forward to go forward
