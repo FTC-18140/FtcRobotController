@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import static java.lang.Math.abs;
 
@@ -14,7 +15,8 @@ public class Teleop extends OpMode
     DcMotor rightFront = null;
     DcMotor leftRear = null;
     DcMotor rightRear = null;
-    
+    DcMotor intake ;
+
 
     public void init()
     {
@@ -76,16 +78,25 @@ public class Teleop extends OpMode
             leftRear = null;
         }
 
-
-
-
-
-
-
-
+        intake = hardwareMap.dcMotor.get("intake");
+        intake.setDirection(DcMotorSimple.Direction.FORWARD);
+        //ServoHardwareMapping
+        //   servo = hardwareMap.servo.get("servo");
+        // servo.setPosition(servoPosition);
 
 
     }
+
+
+
+
+
+
+
+
+
+
+
     public void start(){}
 
     public void loop()
@@ -97,6 +108,12 @@ public class Teleop extends OpMode
         double right = -gamepad1.left_stick_x;        // push left joystick to the right to strafe right
         double clockwise = -gamepad1.right_stick_x;   // push right joystick to the right to rotate clockwise
 
+        //Intake reverse?
+
+        intake.setPower(1);
+        if (gamepad1.x){
+            intake.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
 
         //inverse kinematic transformation
 // to convert your joystick inputs to 4 motor commands:
@@ -107,7 +124,7 @@ public class Teleop extends OpMode
 
 
         //wheel speed commands
-// so that no wheel speed command exceeds magnitude of 1:
+// so that no wheel speed command exceeds magnitude of .5:
         double max = abs(mfrontLeft);
         if (abs(mfrontRight) > max) {
             max = abs(mfrontRight);
@@ -129,10 +146,9 @@ public class Teleop extends OpMode
         leftFront.setPower(mfrontLeft);
         leftRear.setPower(mbackLeft);
 
-
-
-
     }
+
+
     public void stop()
     {
         rightFront.setPower(0.0);
@@ -141,7 +157,6 @@ public class Teleop extends OpMode
         leftRear.setPower(0.0);
     }
 
-    //Intake section
 
 
 
@@ -163,7 +178,10 @@ public class Teleop extends OpMode
 
 
 
-    //shooter section
+
+
+
+
 
 
 
