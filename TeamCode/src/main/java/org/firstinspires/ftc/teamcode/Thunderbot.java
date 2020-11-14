@@ -29,10 +29,14 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.os.AsyncTask;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /**
  * This is NOT an opmode.
@@ -60,7 +64,7 @@ public class Thunderbot
     }
 
     /* Initialize standard Hardware interfaces */
-    public void init(HardwareMap ahwMap) {
+    public void init(HardwareMap ahwMap, Telemetry telemetry) {
         // Save reference to Hardware map
         hwMap = ahwMap;
 
@@ -89,5 +93,8 @@ public class Thunderbot
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        telemetry.addData("Status", "Hardware Initialized");
+        telemetry.addData("Status", "Encoders Reset");
+        telemetry.update();
     }
 }
