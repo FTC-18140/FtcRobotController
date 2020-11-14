@@ -1,24 +1,19 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import static java.lang.Math.abs;
 
-@TeleOp(name="Teleop", group="Teleop")
-//@Disabled
-public class Teleop extends OpMode
+@TeleOp(name="Mecanum", group="Teleop")
+public class Mecanum extends OpMode
 {
     DcMotor leftFront = null;
     DcMotor rightFront = null;
     DcMotor leftRear = null;
     DcMotor rightRear = null;
-    DcMotor intake ;
-
 
     public void init()
     {
@@ -81,42 +76,26 @@ public class Teleop extends OpMode
         }
 
 
-        intake = hardwareMap.dcMotor.get("intake");
-        intake.setDirection(DcMotorSimple.Direction.FORWARD);
-        //ServoHardwareMapping
-        //   servo = hardwareMap.servo.get("servo");
-        // servo.setPosition(servoPosition);
+
+
+
+
+
+
 
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
     public void start(){}
 
     public void loop()
     {
+
 
         //joystick values x and y on left stick; x only on right stick
         double forward = gamepad1.left_stick_y;     // push left joystick forward to go forward
         double right = -gamepad1.left_stick_x;        // push left joystick to the right to strafe right
         double clockwise = -gamepad1.right_stick_x;   // push right joystick to the right to rotate clockwise
 
-        //Intake reverse?
-
-        intake.setPower(1);
-        if (gamepad1.x){
-            intake.setDirection(DcMotorSimple.Direction.REVERSE);
-        }
 
         //inverse kinematic transformation
 // to convert your joystick inputs to 4 motor commands:
@@ -127,7 +106,7 @@ public class Teleop extends OpMode
 
 
         //wheel speed commands
-// so that no wheel speed command exceeds magnitude of .5:
+// so that no wheel speed command exceeds magnitude of 1:
         double max = abs(mfrontLeft);
         if (abs(mfrontRight) > max) {
             max = abs(mfrontRight);
@@ -149,9 +128,10 @@ public class Teleop extends OpMode
         leftFront.setPower(mfrontLeft);
         leftRear.setPower(mbackLeft);
 
+
+
+
     }
-
-
     public void stop()
     {
         rightFront.setPower(0.0);
@@ -160,6 +140,7 @@ public class Teleop extends OpMode
         leftRear.setPower(0.0);
     }
 
+    //Intake section
 
 
 
@@ -181,10 +162,7 @@ public class Teleop extends OpMode
 
 
 
-
-
-
-
+    //shooter section
 
 
 
