@@ -29,6 +29,15 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -76,6 +85,10 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
     static final double     DRIVE_SPEED             = 0.6;
     static final double     TURN_SPEED              = 0.5;
 
+    //for turning in degrees program
+    BNO055IMU imu;
+    Orientation angles;
+
     @Override
     public void runOpMode() {
 
@@ -101,6 +114,17 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
                           robot.leftRear.getCurrentPosition(),
                           robot.rightRear.getCurrentPosition());
         telemetry.update();
+
+        //turn for degrees program
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+
+        //parameters.calibrationDataFile = "BNO055IMUCalibration.json"; //leave commented
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -173,7 +197,15 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
                                             robot.rightFront.getCurrentPosition(),
                                             robot.leftRear.getCurrentPosition(),
                                             robot.rightRear.getCurrentPosition());
+                //telemetry for turning in degrees
+               angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+                telemetry.addData("Heading: ",angles.firstAngle);
+                telemetry.addData("Roll: ",angles.firstAngle);
+                telemetry.addData("Pitch: ",angles.firstAngle);
+
                 telemetry.update();
+
+                sleep(500);
             }
 
             // Stop all motion;
