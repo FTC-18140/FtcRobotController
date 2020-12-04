@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -54,9 +55,16 @@ public class Thunderbot
     DcMotor leftRear = null;
     DcMotor rightRear = null;
 
+    static final double     COUNTS_PER_MOTOR_REV    = 28;      // goBuilda 5202 motors
+    static final double     DRIVE_GEAR_REDUCTION    = 19.2;    // This is < 1.0 if geared UP
+    static final double     WHEEL_DIAMETER_INCHES   = 4.0;     // For figuring circumference
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
+
+
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
-    private ElapsedTime period  = new ElapsedTime();
+    Telemetry telemetry         =  null;
+    private ElapsedTime runtime  = new ElapsedTime();
 
     /* Constructor */
     public Thunderbot(){
@@ -64,9 +72,10 @@ public class Thunderbot
     }
 
     /* Initialize standard Hardware interfaces */
-    public void init(HardwareMap ahwMap, Telemetry telemetry) {
+    public void init(HardwareMap ahwMap, Telemetry telem) {
         // Save reference to Hardware map
         hwMap = ahwMap;
+        telemetry = telem;
 
         //Define & Initialize Motors
         rightFront = hwMap.dcMotor.get("rightFront");
@@ -95,6 +104,86 @@ public class Thunderbot
 
         telemetry.addData("Status", "Hardware Initialized");
         telemetry.addData("Status", "Encoders Reset");
+        telemetry.addData("Status", "Thunderbot Ready");
         telemetry.update();
+    }
+    
+    //method for Driving from a Current Position to a Requested Position
+    public void driveStraight(double speed, double distance, double timeoutS, LinearOpMode caller)
+    {
+
+        driveToPos( speed, distance, distance, timeoutS, caller);
+
+    }
+
+    public void pointTurn(double speed, double distance, double timeoutS, LinearOpMode caller)
+    {
+        driveToPos( speed, distance, -distance, timeoutS, caller);
+    }
+
+
+    public void driveToPos(double speed, double lDistance, double rDistance, double timeoutS, LinearOpMode caller )
+    {
+        int newLeftTarget;
+        int newRightTarget;
+
+        newLeftTarget = leftRear.getCurrentPosition() + (int)(lDistance * COUNTS_PER_INCH);
+        newRightTarget = rightRear.getCurrentPosition() + (int)(rDistance * COUNTS_PER_INCH);
+        leftFront.setTargetPosition(newLeftTarget);
+        rightFront.setTargetPosition(newRightTarget);
+        leftRear.setTargetPosition(newLeftTarget);
+        rightRear.setTargetPosition(newRightTarget);
+
+        // Turn On RUN_TO_POSITION
+        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // reset the timeout time and start motion.
+        runtime.reset();
+        leftFront.setPower(Math.abs(speed));
+        rightFront.setPower(Math.abs(speed));
+        leftRear.setPower(Math.abs(speed));
+        rightRear.setPower(Math.abs(speed));
+
+        while ( caller.opModeIsActive() &&
+                (runtime.seconds() < timeoutS) &&
+                isBusy() )
+        {
+
+            // Display it for the driver.
+            telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
+            telemetry.addData("Path2",  "Running at %7d :%7d",
+                    leftFront.getCurrentPosition(),
+                    rightFront.getCurrentPosition(),
+                    leftRear.getCurrentPosition(),
+                    rightRear.getCurrentPosition());
+            telemetry.update();
+        }
+
+        // Stop the robot because it is done with teh move.
+        stop();
+
+        // Turn off RUN_TO_POSITION
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+    }
+
+    public boolean isBusy()
+    {
+        return leftFront.isBusy() && rightFront.isBusy()  && leftRear.isBusy() && rightRear.isBusy();
+    }
+
+    public void stop()
+    {
+        // Stop all motion;
+        leftFront.setPower(0);
+        rightFront.setPower(0);
+        leftRear.setPower(0);
+        rightRear.setPower(0);
     }
 }
