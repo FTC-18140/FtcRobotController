@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-
 import static java.lang.Math.abs;
 
 @TeleOp(name="Teleop", group="Teleop")
@@ -18,6 +17,19 @@ public class Teleop extends OpMode
     DcMotor leftRear = null;
     DcMotor rightRear = null;
     DcMotor intake ;
+    DcMotor rampMotor;
+    DcMotor shooterMotor;
+    Servo leftClaw;
+    Servo rightClaw;
+
+
+    boolean forwardIntake = true;
+    boolean ramp = true;
+    boolean shooter = true;
+
+
+
+
 
 
     public void init()
@@ -83,9 +95,27 @@ public class Teleop extends OpMode
 
         intake = hardwareMap.dcMotor.get("intake");
         intake.setDirection(DcMotorSimple.Direction.FORWARD);
+
+
+
+        rampMotor = hardwareMap.dcMotor.get("rampMotor");
+        rampMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+
+
+        shooterMotor = hardwareMap.dcMotor.get("shooterMotor");
+        shooterMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+
+
         //ServoHardwareMapping
-        //   servo = hardwareMap.servo.get("servo");
-        // servo.setPosition(servoPosition);
+
+        leftClaw = hardwareMap.servo.get("leftClaw");
+        leftClaw.setPosition(0);
+
+        rightClaw = hardwareMap.servo.get("rightClaw");
+        rightClaw.setPosition(1);
+
+
+
 
 
     }
@@ -97,26 +127,71 @@ public class Teleop extends OpMode
 
 
 
-
-
-
-
     public void start(){}
 
-    public void loop()
-    {
+    public void loop() {
 
         //joystick values x and y on left stick; x only on right stick
         double forward = gamepad1.left_stick_y;     // push left joystick forward to go forward
         double right = -gamepad1.left_stick_x;        // push left joystick to the right to strafe right
         double clockwise = -gamepad1.right_stick_x;   // push right joystick to the right to rotate clockwise
 
-        //Intake reverse?
+        //Intake reverse 5;
 
         intake.setPower(1);
-        if (gamepad1.x){
-            intake.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
+        if(gamepad1.x && !forwardIntake) {
+            if (intake.getPower() == 1) intake.setPower(-1);
+            else intake.setPower(1);
+            forwardIntake = true;
+        } else if (!gamepad1.x) forwardIntake = false;
+
+
+         //Ramp motor toggle switch
+
+        rampMotor.setPower(0.3);
+
+        if(gamepad1.b && !ramp) {
+            if (rampMotor.getPower() == 0.3) rampMotor.setPower(0);
+            else rampMotor.setPower(0.3);
+            ramp = true;
+        } else if (!gamepad1.b) ramp = false;
+
+
+
+        // shooter motor toggle switch
+
+        shooterMotor.setPower(0);
+
+        if(gamepad1.a && !shooter) {
+            if (shooterMotor.getPower() == 0) shooterMotor.setPower(1);
+            else shooterMotor.setPower(0);
+            shooter = true;
+        } else if (!gamepad1.a) shooter = false;
+
+
+
+        //arm claw controls
+
+        if(gamepad1.right_bumper) {
+            leftClaw.setPosition(.5);
+            rightClaw.setPosition(.5);
+        }  else {
+            leftClaw.setPosition(0);
+            rightClaw.setPosition(1);
         }
+
+
+
+
+
+
+
+
+
+
+
 
         //inverse kinematic transformation
 // to convert your joystick inputs to 4 motor commands:
@@ -159,36 +234,6 @@ public class Teleop extends OpMode
         rightRear.setPower(0.0);
         leftRear.setPower(0.0);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
