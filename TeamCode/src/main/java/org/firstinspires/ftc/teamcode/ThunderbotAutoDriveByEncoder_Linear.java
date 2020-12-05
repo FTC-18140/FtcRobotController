@@ -56,11 +56,15 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
+
             // Step through each leg of the path,
             // Note: Reverse movement is obtained by setting a negative distance (not speed)
             robot.driveStraight(DRIVE_SPEED, 48, 48, this);  // S1: Forward 47 Inches with 5 Sec timeout
             robot.pointTurn(TURN_SPEED, 48, 48, this);  // S2: Turn Right 12 Inches with 4 Sec timeout
             robot.driveStraight(DRIVE_SPEED, -50, 50, this);  // S3: Reverse 24 Inches with 4 Sec timeout
+
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            if(angles.firstAngle > 100){ //add power/speed to work
 
             telemetry.addData("Path", "Complete");
             telemetry.update();
