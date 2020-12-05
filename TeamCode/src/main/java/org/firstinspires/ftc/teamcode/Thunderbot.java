@@ -31,13 +31,18 @@ package org.firstinspires.ftc.teamcode;
 
 import android.os.AsyncTask;
 
+import androidx.renderscript.Byte2;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
 
 /**
  * This is NOT an opmode.
@@ -54,6 +59,11 @@ public class Thunderbot
     DcMotor rightFront = null;
     DcMotor leftRear = null;
     DcMotor rightRear = null;
+    DcMotor intake;
+    DcMotor rampMotor;
+    DcMotor shooterMotor;
+    Servo leftClaw;
+    Servo rightClaw;
 
     static final double     COUNTS_PER_MOTOR_REV    = 28;      // goBuilda 5202 motors
     static final double     DRIVE_GEAR_REDUCTION    = 19.2;    // This is < 1.0 if geared UP
@@ -101,6 +111,24 @@ public class Thunderbot
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        intake = hwMap.dcMotor.get("intake");
+        intake.setDirection(DcMotorSimple.Direction.FORWARD);
+        intake.setPower(1);
+
+        rampMotor = hwMap.dcMotor.get("rampMotor");
+        rampMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        rampMotor.setPower(.3);
+
+        shooterMotor = hwMap.dcMotor.get("shooterMotor");
+        shooterMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        shooterMotor.setPower(0);
+
+        leftClaw = hwMap.servo.get("leftClaw");
+        leftClaw.setPosition(0);
+
+        rightClaw = hwMap.servo.get("rightClaw");
+        rightClaw.setPosition(1);
 
         telemetry.addData("Status", "Hardware Initialized");
         telemetry.addData("Status", "Encoders Reset");
@@ -186,4 +214,16 @@ public class Thunderbot
         leftRear.setPower(0);
         rightRear.setPower(0);
     }
+   public void intake(double speed){
+
+   }
+   public void rampMotor(double speed) {
+
+   }
+   public void shooterMotor(double speed){
+
+   }
+   public void Servos(double position){
+
+   }
 }
