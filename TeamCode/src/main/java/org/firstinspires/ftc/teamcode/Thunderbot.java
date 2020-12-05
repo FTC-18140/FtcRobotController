@@ -31,6 +31,12 @@ package org.firstinspires.ftc.teamcode;
 
 import android.os.AsyncTask;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -38,6 +44,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+
 
 /**
  * This is NOT an opmode.
@@ -66,6 +74,11 @@ public class Thunderbot
     Telemetry telemetry         =  null;
     private ElapsedTime runtime  = new ElapsedTime();
 
+    /* Gyro */
+    BNO055IMU imu;
+    Orientation angles;
+
+
     /* Constructor */
     public Thunderbot(){
 
@@ -76,6 +89,15 @@ public class Thunderbot
         // Save reference to Hardware map
         hwMap = ahwMap;
         telemetry = telem;
+
+        /* turn for degrees program */
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+
+        imu = hwMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
 
         //Define & Initialize Motors
         rightFront = hwMap.dcMotor.get("rightFront");
@@ -160,6 +182,14 @@ public class Thunderbot
                     leftRear.getCurrentPosition(),
                     rightRear.getCurrentPosition());
             telemetry.update();
+
+            //telemetry for turning in degrees
+                angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+                telemetry.addData("Heading: ",angles.firstAngle);
+                telemetry.addData("Roll: ",angles.firstAngle);
+                telemetry.addData("Pitch: ",angles.firstAngle);
+
+                telemetry.update();
         }
 
         // Stop the robot because it is done with teh move.
