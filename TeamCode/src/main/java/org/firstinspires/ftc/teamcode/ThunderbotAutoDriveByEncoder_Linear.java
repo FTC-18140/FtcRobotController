@@ -33,7 +33,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit; // gyro
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
@@ -61,7 +61,6 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-
             // Step through each leg of the path,
             // Note: Reverse movement is obtained by setting a negative distance (not speed)
             robot.driveStraight(DRIVE_SPEED, 48, 48, this);  // S1: Forward 47 Inches with 5 Sec timeout
@@ -69,10 +68,10 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
             robot.driveStraight(DRIVE_SPEED, -50, 50, this);  // S3: Reverse 24 Inches with 4 Sec timeout
 
             robot.angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES); //turn 90 degrees
-            if(robot.angles.firstAngle > 90) { // degrees
-                robot.leftFront.setPower(TURN_SPEED);// power
+            if(robot.angles.firstAngle < 90) { // degrees
+                robot.leftFront.setPower(-TURN_SPEED);// power
                 robot.rightFront.setPower(TURN_SPEED);
-                robot.leftRear.setPower(TURN_SPEED);
+                robot.leftRear.setPower(-TURN_SPEED);
                 robot.rightRear.setPower(TURN_SPEED);
             }
 
