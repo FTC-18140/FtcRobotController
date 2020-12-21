@@ -36,6 +36,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 
 import com.qualcomm.robotcore.hardware.DcMotor; // motors
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -45,6 +46,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 
 /**
@@ -64,7 +67,7 @@ public class Thunderbot
     DcMotor rightRear = null;
 
     static final double     COUNTS_PER_MOTOR_REV    = 28;      // goBuilda 5202 motors
-    static final double     DRIVE_GEAR_REDUCTION    = 19.2;    // This is < 1.0 if geared UP
+    static final double     DRIVE_GEAR_REDUCTION    = 3;    // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 4.0;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
 
@@ -75,8 +78,8 @@ public class Thunderbot
     private ElapsedTime runtime  = new ElapsedTime();
 
     /* Gyro */
-    BNO055IMU imu;
-    Orientation angles;
+    BNO055IMU imu = null;
+    Orientation angles = null;
 
 
     /* Constructor */
@@ -92,9 +95,12 @@ public class Thunderbot
 
         /* turn for degrees program */
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         imu = hwMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
@@ -128,8 +134,10 @@ public class Thunderbot
         telemetry.addData("Status", "Encoders Reset");
         telemetry.addData("Status", "Thunderbot Ready");
         telemetry.update();
+
+        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
     }
-    
+
     //method for Driving from a Current Position to a Requested Position
     public void driveStraight(double speed, double distance, double timeoutS, LinearOpMode caller)
     {
@@ -169,7 +177,7 @@ public class Thunderbot
         leftRear.setPower(Math.abs(speed));
         rightRear.setPower(Math.abs(speed));
 
-        while ( caller.opModeIsActive() &&
+        while (caller.opModeIsActive() &&
                 (runtime.seconds() < timeoutS) &&
                 isBusy() )
         {
@@ -182,15 +190,17 @@ public class Thunderbot
                     leftRear.getCurrentPosition(),
                     rightRear.getCurrentPosition());
             telemetry.update();
-
-            //telemetry for turning in degrees
-                angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-                telemetry.addData("Heading: ",angles.firstAngle);
-                telemetry.addData("Roll: ",angles.firstAngle);
-                telemetry.addData("Pitch: ",angles.firstAngle);
-
-                telemetry.update();
         }
+
+        while (caller.opModeIsActive()){
+            //telemetry for turning in degrees
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            telemetry.addData("Heading: ",angles.firstAngle);
+            telemetry.addData("Roll: ",angles.firstAngle);
+            telemetry.addData("Pitch: ",angles.firstAngle);
+            telemetry.update();
+        }
+
 
         // Stop the robot because it is done with teh move.
         stop();

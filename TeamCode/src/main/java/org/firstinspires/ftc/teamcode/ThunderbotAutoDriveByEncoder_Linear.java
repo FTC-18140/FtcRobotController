@@ -47,8 +47,8 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
     /* Declare OpMode members. */
     Thunderbot robot = new Thunderbot();   // Use a Thunderbot's hardware
 
-    static final double DRIVE_SPEED = 0.6;
-    static final double TURN_SPEED = 0.5;
+    static final double DRIVE_SPEED = 0.1;
+    static final double TURN_SPEED = 0.2;
 
 
     @Override
@@ -63,16 +63,16 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
         if (opModeIsActive()) {
             // Step through each leg of the path,
             // Note: Reverse movement is obtained by setting a negative distance (not speed)
-            robot.driveStraight(DRIVE_SPEED, 48, 48, this);  // S1: Forward 47 Inches with 5 Sec timeout
-            robot.pointTurn(TURN_SPEED, 48, 48, this);  // S2: Turn Right 12 Inches with 4 Sec timeout
-            robot.driveStraight(DRIVE_SPEED, -50, 50, this);  // S3: Reverse 24 Inches with 4 Sec timeout
+            robot.driveStraight(DRIVE_SPEED, -5, 48, this);  // S1: Forward 47 Inches with 5 Sec timeout
+            //robot.pointTurn(TURN_SPEED, 48, 48, this);  // S2: Turn Right 12 Inches with 4 Sec timeout
+            //robot.driveStraight(DRIVE_SPEED, -50, 50, this);  // S3: Reverse 24 Inches with 4 Sec timeout
 
-            robot.angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES); //turn 90 degrees
-            if(robot.angles.firstAngle < 90) { // degrees
-                robot.leftFront.setPower(-TURN_SPEED);// power
-                robot.rightFront.setPower(TURN_SPEED);
-                robot.leftRear.setPower(-TURN_SPEED);
-                robot.rightRear.setPower(TURN_SPEED);
+           robot.angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES); //turn 90 degrees
+            while(opModeIsActive() && robot.angles.firstAngle < -90) { // degrees
+                robot.leftFront.setPower(TURN_SPEED);// power
+                robot.rightFront.setPower(-TURN_SPEED);
+                robot.leftRear.setPower(TURN_SPEED);
+                robot.rightRear.setPower(-TURN_SPEED);
             }
 
             telemetry.addData("Path", "Complete");
