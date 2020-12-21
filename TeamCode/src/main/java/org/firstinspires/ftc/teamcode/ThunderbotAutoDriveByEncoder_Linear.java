@@ -33,19 +33,14 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit; // gyro
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 @Autonomous(name="Thunderbot: Auto Drive By Encoder", group="Thunderbot")
 //@Disabled
 public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
     /* Declare OpMode members. */
     Thunderbot robot = new Thunderbot();   // Use a Thunderbot's hardware
+    double currentAngle = 0.0;
+    double startAngle = 0.0;
 
     static final double DRIVE_SPEED = 0.1;
     static final double TURN_SPEED = 0.2;
@@ -67,12 +62,15 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
             //robot.pointTurn(TURN_SPEED, 48, 48, this);  // S2: Turn Right 12 Inches with 4 Sec timeout
             //robot.driveStraight(DRIVE_SPEED, -50, 50, this);  // S3: Reverse 24 Inches with 4 Sec timeout
 
-           robot.angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES); //turn 90 degrees
-            while(opModeIsActive() && robot.angles.firstAngle < -90) { // degrees
+//           robot.angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES); //turn 90 degrees
+            currentAngle = robot.updateHeading();
+            startAngle = currentAngle;
+            while(opModeIsActive() && Math.abs(currentAngle-startAngle) < 90) { // degrees
                 robot.leftFront.setPower(TURN_SPEED);// power
                 robot.rightFront.setPower(-TURN_SPEED);
                 robot.leftRear.setPower(TURN_SPEED);
                 robot.rightRear.setPower(-TURN_SPEED);
+                currentAngle = robot.updateHeading();
             }
 
             telemetry.addData("Path", "Complete");
