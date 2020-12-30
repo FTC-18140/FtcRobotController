@@ -54,23 +54,26 @@ import java.util.concurrent.TimeUnit;
  *
  * This class can be used to define all the specific hardware for a single robot.
  * In this case that robot is a Thunderbot.
- * See PushbotTeleopTank_Iterative and others classes starting with "Pushbot" for usage examples.
  */
 
 public class Thunderbot
 {
     /* Public OpMode members. */
+    // Chassis drive motors
     DcMotor LF = null;
     DcMotor RF = null;
     DcMotor LR = null;
     DcMotor RR = null;
 
+    // Mechanism motors
     DcMotor intake = null;
     DcMotor rampMotor = null;
     DcMotor shooterMotor = null;
+    // Claw servos
     Servo leftClaw = null;
     Servo rightClaw = null;
 
+    // Variables used to calculate encoder ticks per wheel rotation
     static final double     COUNTS_PER_MOTOR_REV    = 28;      // goBuilda 5202 motors
     static final double     DRIVE_GEAR_REDUCTION    = 3;    // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 4.0;     // For figuring circumference
@@ -91,19 +94,15 @@ public class Thunderbot
     BNO055IMU imu = null;
 
 
-    /* Constructor */
-    public Thunderbot()
-    {
-
-    }
-
     /* Initialize standard Hardware interfaces */
-    public void init(HardwareMap ahwMap, Telemetry telem) {
+    public void init(HardwareMap ahwMap, Telemetry telem)
+    {
         // Save reference to Hardware map
         hwMap = ahwMap;
         telemetry = telem;
         startTime = 0;
 
+        // Initialize the Gryo
         try
         {
             // Set up the parameters with which we will use our IMU. Note that integration
@@ -128,6 +127,7 @@ public class Thunderbot
         }
 
 
+        // Initialize Right-Front motor
         try
         {
             RF = ahwMap.get(DcMotor.class, "rightFront");
@@ -142,6 +142,7 @@ public class Thunderbot
             telemetry.addData("rightFront not found in config file", "");
             RF = null;
         }
+        // Initialize Right-Rear motor
         try
         {
             RR = ahwMap.get(DcMotor.class, "rightRear");
@@ -156,6 +157,7 @@ public class Thunderbot
             telemetry.addData("rightRear not found in config file", "");
             RR = null;
         }
+        // Initialize Left-Front motor
         try
         {
             LF = ahwMap.get(DcMotor.class, "leftFront");
@@ -170,6 +172,7 @@ public class Thunderbot
             telemetry.addData("leftFront not found in config file", "");
             LF = null;
         }
+        // Initialize Left-Rear motor
         try
         {
             LR = ahwMap.get(DcMotor.class, "leftRear");
@@ -185,8 +188,9 @@ public class Thunderbot
             LR = null;
         }
 
-        //Intake Motors Hardware Mapping
-        try {
+        // Initialize Intake motor
+        try
+        {
             intake = ahwMap.dcMotor.get("intake");
             intake.setDirection(DcMotorSimple.Direction.FORWARD);
         }
@@ -195,7 +199,9 @@ public class Thunderbot
             intake = null;
             telemetry.addData("intake not found in config file", "");
         }
-        try {
+        // Initialize Ramp motor
+        try
+        {
             rampMotor = ahwMap.dcMotor.get("rampMotor");
             rampMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         }
@@ -204,7 +210,9 @@ public class Thunderbot
             rampMotor = null;
             telemetry.addData("rampMotor not found in config file", "");
         }
-        try {
+        // Initialize Shooter motor
+        try
+        {
             shooterMotor = ahwMap.dcMotor.get("shooterMotor");
             shooterMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         }
@@ -213,9 +221,9 @@ public class Thunderbot
             shooterMotor = null;
             telemetry.addData("shooterMotor not found in config file", "");
         }
-
-        //Servo Hardware Mapping
-        try {
+        // Initialize left-Claw servo
+        try
+        {
             leftClaw = ahwMap.servo.get("leftClaw");
             leftClaw.setPosition(0);
         }
@@ -224,7 +232,9 @@ public class Thunderbot
             leftClaw = null;
             telemetry.addData("leftClaw not found in config file", "");
         }
-        try {
+        // Initialize right-Claw servo
+        try
+        {
             rightClaw = ahwMap.servo.get("rightClaw");
             rightClaw.setPosition(1);
         }
@@ -234,10 +244,20 @@ public class Thunderbot
             telemetry.addData("rightClaw not found in config file", "");
         }
 
+        // Used to indicate if the robot is actively moving or not
         moving = false;
 
     }
 
+    /**
+     * The most basic motor control method -- all methods that command the chassis use joystickDrive to do so
+     * Converts joystick input to power and directional motor commands for a mechanum chassis.
+     * @param leftStickX  x-axis on the left joystick
+     * @param leftStickY  y-axis on the right joystick
+     * @param rightStickX  x-axis on the left joystick
+     * @param rightStickY  y-axis on the right joystick
+     * @param powerLimit  The max power the chassis can use
+     */
     public void joystickDrive(double leftStickX, double leftStickY, double rightStickX, double rightStickY, double powerLimit)
     {
         /*
@@ -300,22 +320,25 @@ public class Thunderbot
      * backward, left, or right.
      *
      * @param power  How fast the robot will drive.
-     * @param direction  In which direction the robot will drive (forward, backward, left, right,
-     *                   or 45 degrees in any direction).
-     * @param distance  How far the robot will drive.
+     * @param direction  In which direction the robot will drive (forward, backward, left, or right).
+     * @param distance  How far the robot will drive (in).
      * @param time  The max time this move can take. A time-out feature: if the move stalls for some
      *              reason, the timer will catch it.
      * @return  A boolean that tells us whether or not the robot is moving.
      */
     public boolean drive(double power, double direction, double distance, double time)
     {
+        // Converting inches of travel to encoder ticks
         double driveDistance = COUNTS_PER_INCH * distance;
+        // Represents the difference between the robot's current heading and the target heading
         double correction;
 
         double actual = updateHeading();
 
+        // Executes once at the beginning of the move
         if (!moving)
         {
+            // Setting motors to "Brake" mode
             setZeroBehavior("BRAKE");
 
             initialHeading = updateHeading();
@@ -331,7 +354,6 @@ public class Thunderbot
             resetStartTime();
             moving = true;
         }
-        telemetry.addData("initial position: ", initialPosition);
 
         if (Math.abs(initialHeading) > 130  &&  actual < 0.0)
         {
@@ -343,25 +365,15 @@ public class Thunderbot
         double lStickX = power * Math.sin(Math.toRadians(direction));
         double lStickY = -(power * Math.cos(Math.toRadians(direction)));
 
-//        telemetry.addData("Right Motor DD: ", Math.abs(rFrontMotor.getCurrentPosition() - initialPosition));
-//        telemetry.addData("Left Motor DD:", Math.abs(lFrontMotor.getCurrentPosition() - initialPosition));
-
-        telemetry.addData("Drive Distance: ", driveDistance);
-        double tmpDistance = Math.abs(encoderMotor.getCurrentPosition() - initialPosition);
-        telemetry.addData("Distance Driven:", tmpDistance);
-        telemetry.addData("getRuntime() = ", getRuntime());
-//        telemetry.addData("time = ", time);
-
         joystickDrive(lStickX, -lStickY, correction, 0.0, power);
 
-//        if (((Math.abs(bulkData.getMotorCurrentPosition(encoderMotor)- initialPosition)) >= driveDistance) || (getRuntime() > time))
         if (((Math.abs(encoderMotor.getCurrentPosition() - initialPosition)) >= driveDistance) || (getRuntime() > time))
         {
+            // Stopping the drive motors
             stopChassis();
-
+            // Setting motors to "Float"
             setZeroBehavior("FLOAT");
-
-            encoderMotor = LF;
+            // Indicating that the robot has stopped moving
             moving = false;
         }
 
@@ -390,13 +402,17 @@ public class Thunderbot
             currentRawHeading += 360;
         }
 
+        // Executes once at the beginning of the turn
         if (!moving)
         {
             setZeroBehavior("BRAKE");
 
+            // Capturing the robot's start heading
             initialHeading = currentRawHeading;
+            // Calculating the error between the current heading and the target heading
             error = targetHeading - initialHeading;
 
+            // Adding or subtracting 360 degrees to the error to keep the gyro from flipping directions
             if (error > 180)
             {
                 error -= 360;
@@ -405,7 +421,7 @@ public class Thunderbot
             {
                 error += 360;
             }
-
+            // Setting the direction of the motors depending on the turn direction
             if (error < 0)
             {
                 directionalPower = -power;
@@ -431,8 +447,6 @@ public class Thunderbot
             resetStartTime();
             moving = true;
         }
-        telemetry.addData("error: ", error);
-        telemetry.addData("directionalPower: ", directionalPower);
 
         joystickDrive(0.0, 0.0, directionalPower, 0.0, power);
 
@@ -448,6 +462,8 @@ public class Thunderbot
         return !moving;
     }
 
+
+    // Returns the current robot heading
     public double updateHeading()
     {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -489,6 +505,7 @@ public class Thunderbot
         }
     }
 
+    // Stops the mechanism motors
     public void stopIntake()
     {
         intake.setPower(0.0);

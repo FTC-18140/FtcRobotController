@@ -14,7 +14,7 @@ public class Teleop extends OpMode
     boolean shooter = true;
 
 
-
+    // Executes once when the init button is pressed
     public void init()
     {
 
@@ -23,8 +23,10 @@ public class Teleop extends OpMode
     }
 
 
+    // Executes once directly after the start button is pressed
     public void start(){}
 
+    // Executes in an infinite loop until the stop button is pressed
     public void loop() {
 
         // Intake Controls
@@ -88,6 +90,7 @@ public class Teleop extends OpMode
     }
 
 
+    // Executes once when the stop button is pressed
     public void stop()
     {
         robot.stopChassis();

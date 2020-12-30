@@ -22,13 +22,16 @@ public class ThunderbotAutonomous_Stnd extends OpMode
      * Simulates a left strafe command.*/
     static final double LEFT = 90.0;
 
+    // Executes once when init button is pressed
     public void init()
     {
         robot.init(hardwareMap, telemetry);
     }
 
+    // Executes once when start button is pressed
     public void start(){}
 
+    // Executes in an infinite loop until stop button is pressed
     public void loop()
     {
         switch (state)
@@ -59,6 +62,7 @@ public class ThunderbotAutonomous_Stnd extends OpMode
         }
     }
 
+    // Executes once when the stop button is pressed
     public void stop()
     {
         robot.stopChassis();
