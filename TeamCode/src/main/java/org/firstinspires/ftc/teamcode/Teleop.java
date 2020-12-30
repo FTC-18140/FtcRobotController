@@ -17,9 +17,7 @@ public class Teleop extends OpMode
     // Executes once when the init button is pressed
     public void init()
     {
-
         robot.init(hardwareMap, telemetry);
-
     }
 
 

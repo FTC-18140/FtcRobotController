@@ -53,7 +53,7 @@ import java.util.concurrent.TimeUnit;
  * This is NOT an opmode.
  *
  * This class can be used to define all the specific hardware for a single robot.
- * In this case that robot is a Thunderbot.
+ * In this case that robot is referred to by the class name, Thunderbot
  */
 
 public class Thunderbot
