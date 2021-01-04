@@ -62,21 +62,10 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
             //robot.pointTurn(TURN_SPEED, 48, 48, this);  // S2: Turn Right 12 Inches with 4 Sec timeout
             //robot.driveStraight(DRIVE_SPEED, -50, 50, this);  // S3: Reverse 24 Inches with 4 Sec timeout
 
-//           robot.angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES); //turn 90 degrees
-            currentAngle = robot.updateHeading();
-            startAngle = currentAngle;
-            while(opModeIsActive() && Math.abs(currentAngle-startAngle) < 90) { // degrees
-                robot.leftFront.setPower(TURN_SPEED);// power
-                robot.rightFront.setPower(-TURN_SPEED);
-                robot.leftRear.setPower(TURN_SPEED);
-                robot.rightRear.setPower(-TURN_SPEED);
-                currentAngle = robot.updateHeading();
-            }
+            robot.gyroTurn(90, 0.1); //turn 90 degrees
 
             telemetry.addData("Path", "Complete");
             telemetry.update();
-
-            robot.stop();
         }
     }
 }

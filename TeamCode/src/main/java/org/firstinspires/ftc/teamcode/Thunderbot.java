@@ -215,15 +215,6 @@ public class Thunderbot
             telemetry.update();
         }
 
-        while (caller.opModeIsActive()){
-            //telemetry for turning in degrees
-            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            telemetry.addData("Heading: ",angles.firstAngle);
-            telemetry.addData("Roll: ",angles.firstAngle);
-            telemetry.addData("Pitch: ",angles.firstAngle);
-            telemetry.update();
-        }
-
 
         // Stop the robot because it is done with teh move.
         stop();
@@ -245,6 +236,26 @@ public class Thunderbot
     {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
+    }
+
+    public void gyroTurn(double targetHeading, double power)
+    {
+        double currentAngle = updateHeading();
+        double startAngle = currentAngle;
+        while(Math.abs(currentAngle-startAngle) < targetHeading) { // degrees
+            leftFront.setPower(power);// power
+            rightFront.setPower(-power);
+            leftRear.setPower(power);
+            rightRear.setPower(-power);
+            currentAngle = updateHeading();
+        }
+
+            //telemetry for turning in degrees
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            telemetry.addData("Heading: ",angles.firstAngle);
+            telemetry.update();
+
+        stop();
     }
 
     public void stop()
