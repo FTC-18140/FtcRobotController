@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import java.util.concurrent.TimeUnit;
 
 @Autonomous(name="Thunderbot: Auto Drive By Encoder", group="Thunderbot")
 //@Disabled
@@ -59,7 +60,11 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
             // Step through each leg of the path,
             // Note: Reverse movement is obtained by setting a negative distance (not speed)
             robot.driveStraight(DRIVE_SPEED, -36, 48, this); // go forward 36 inches or 3ft
+            stop();
+            sleep(3000);
             robot.gyroTurn(90, 0.1); //turn 90 degrees
+            stop();
+            sleep(3000);
             robot.driveStraight(DRIVE_SPEED, -36, 48, this); // go forward 36 inches or 3ft
 
             telemetry.addData("Path", "Complete");
