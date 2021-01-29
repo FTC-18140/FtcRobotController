@@ -93,18 +93,6 @@ public class Thunderbot
         hwMap = ahwMap;
         telemetry = telem;
 
-//        /* turn for degrees program */
-//        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-//        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-//        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-//        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
-//        parameters.loggingEnabled      = true;
-//        parameters.loggingTag          = "IMU";
-//        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-//
-//        imu = hwMap.get(BNO055IMU.class, "imu");
-//        imu.initialize(parameters);
-
         try
         {
             // Set up the parameters with which we will use our IMU. Note that integration
@@ -256,6 +244,41 @@ public class Thunderbot
             telemetry.update();
 
         stop();
+    }
+
+    public void driveStraight (int duration, double power) throws InterruptedException{
+        double leftFrontSpeed;
+        double rightFrontSpeed;
+        double leftRearSpeed;
+        double rightRearSpeed;
+
+        double target = mrGyro.getIntegratedValue;
+        double startPosition = MLeft.getCurrentPosition();
+
+        while (MLeft.getCurrentPosition() < duration + startPosition){
+            int zAccumulated = mrGyro.getIntegratedValue;
+
+            leftFrontSpeed = power + (zAccumulated - target)/100;
+            rightFrontSpeed  = power - (zAccumulated - target)/100;
+            leftRearSpeed  = power + (zAccumulated - target)/100;
+            rightRearSpeed  = power - (zAccumulated - target)/100;
+
+            leftFrontSpeed = Range.clip(leftFrontSpeed -1, 1);
+            rightFrontSpeed = Range.clip(rightFrontSpeed -1, 1);
+            leftRearSpeed = Range.clip(leftRearSpeed -1, 1);
+            rightRearSpeed = Range.clip(rightRearSpeed -1, 1);
+
+            MLeft.setPower(leftFrontSpeed);
+            MLeft.setPower(leftRearSpeed);
+            MRight.setPower(rightFrontSpeed);
+            MRight.setPower(rightRearSpeed);
+
+            telemetry.addData("1. Left", MLeft.getPower());
+            telemetry.addData("2. Right", MRight.getPower());
+            telemetry.addData("3. Distance to go", duration + startPosition - MLeft.getCurrentPosition());
+
+            waitOneFullHardwareCycle();
+        }
     }
 
     public void stop()
