@@ -37,12 +37,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.util.Range;
 
 import com.qualcomm.robotcore.hardware.DcMotor; // motors
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
@@ -252,33 +254,39 @@ public class Thunderbot
         double leftRearSpeed;
         double rightRearSpeed;
 
-        double target = mrGyro.getIntegratedValue;
-        double startPosition = MLeft.getCurrentPosition();
+        double target = imu.getIntegratedZValue;
+        double startPosition = leftFront.getCurrentPosition();
 
-        while (MLeft.getCurrentPosition() < duration + startPosition){
-            int zAccumulated = mrGyro.getIntegratedValue;
+        while (leftFront.getCurrentPosition() < duration + startPosition){
+            int zAccumulated = imu.getIntegratedZValue;
 
             leftFrontSpeed = power + (zAccumulated - target)/100;
             rightFrontSpeed  = power - (zAccumulated - target)/100;
             leftRearSpeed  = power + (zAccumulated - target)/100;
             rightRearSpeed  = power - (zAccumulated - target)/100;
 
-            leftFrontSpeed = Range.clip(leftFrontSpeed -1, 1);
-            rightFrontSpeed = Range.clip(rightFrontSpeed -1, 1);
-            leftRearSpeed = Range.clip(leftRearSpeed -1, 1);
-            rightRearSpeed = Range.clip(rightRearSpeed -1, 1);
+            leftFrontSpeed = Range.clip(leftFrontSpeed, -1, 1);
+            rightFrontSpeed = Range.clip(rightFrontSpeed, -1, 1);
+            leftRearSpeed = Range.clip(leftRearSpeed, -1, 1);
+            rightRearSpeed = Range.clip(rightRearSpeed, -1, 1);
 
-            MLeft.setPower(leftFrontSpeed);
-            MLeft.setPower(leftRearSpeed);
-            MRight.setPower(rightFrontSpeed);
-            MRight.setPower(rightRearSpeed);
+            leftFront.setPower(leftFrontSpeed);
+            leftRear.setPower(leftRearSpeed);
+            rightFront.setPower(rightFrontSpeed);
+            rightRear.setPower(rightRearSpeed);
 
-            telemetry.addData("1. Left", MLeft.getPower());
-            telemetry.addData("2. Right", MRight.getPower());
-            telemetry.addData("3. Distance to go", duration + startPosition - MLeft.getCurrentPosition());
+            telemetry.addData("1. Left", leftFront.getPower());
+            telemetry.addData("2. Right", rightFront.getPower());
+            telemetry.addData("3. Distance to go", duration + startPosition - leftFront.getCurrentPosition());
 
             waitOneFullHardwareCycle();
         }
+        leftFront.setPower(0);
+        rightFront.setPower(0);
+        leftRear.setPower(0);
+        rightRear.setPower(0);
+
+        waitOneFullHardwareCycle();
     }
 
     public void stop()
