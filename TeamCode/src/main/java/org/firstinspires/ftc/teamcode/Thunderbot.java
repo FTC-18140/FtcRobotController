@@ -248,17 +248,17 @@ public class Thunderbot
         stop();
     }
 
-    public void driveStraight (int duration, double power) throws InterruptedException{
-        double leftFrontSpeed;
+    public void gyroDriveStraight (int duration, double power) throws InterruptedException{
+        double leftFrontSpeed; // creation of speed doubles
         double rightFrontSpeed;
         double leftRearSpeed;
         double rightRearSpeed;
 
-        double target = imu.getIntegratedZValue;
-        double startPosition = leftFront.getCurrentPosition();
+        double target = imu.getIntegratedZValue; //the error is an int in the video with an unknown initial value
+        double startPosition = leftFront.getCurrentPosition(); //getting current position of left front motors encoder
 
-        while (leftFront.getCurrentPosition() < duration + startPosition){
-            int zAccumulated = imu.getIntegratedZValue;
+        while (leftFront.getCurrentPosition() < duration + startPosition){ // motor adjustment loop
+            int zAccumulated = imu.getIntegratedZValue; // same error as the one above
 
             leftFrontSpeed = power + (zAccumulated - target)/100;
             rightFrontSpeed  = power - (zAccumulated - target)/100;
@@ -279,14 +279,17 @@ public class Thunderbot
             telemetry.addData("2. Right", rightFront.getPower());
             telemetry.addData("3. Distance to go", duration + startPosition - leftFront.getCurrentPosition());
 
-            waitOneFullHardwareCycle();
+            waitOneFullHardwareCycle(); // this error is a public void that was used in the video but it is unknown to us
+                                        // it is meant to wait until for the power adjustment and for the encoder values
+                                        // but the wait time is unknown
         }
+
         leftFront.setPower(0);
         rightFront.setPower(0);
         leftRear.setPower(0);
         rightRear.setPower(0);
 
-        waitOneFullHardwareCycle();
+        waitOneFullHardwareCycle(); // same problem as the one above
     }
 
     public void stop()
