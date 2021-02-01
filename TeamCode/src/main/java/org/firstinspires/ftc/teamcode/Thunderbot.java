@@ -254,11 +254,11 @@ public class Thunderbot
         double leftRearSpeed;
         double rightRearSpeed;
 
-        double target = imu.getIntegratedZValue; //the error is an int in the video with an unknown initial value
+        double target = updateHeading(); // origanaly imu.getInitialZValue
         double startPosition = leftFront.getCurrentPosition(); //getting current position of left front motors encoder
 
         while (leftFront.getCurrentPosition() < duration + startPosition){ // motor adjustment loop
-            int zAccumulated = imu.getIntegratedZValue; // same error as the one above
+            double zAccumulated = updateHeading(); // it was initially an int but was changed to a double
 
             leftFrontSpeed = power + (zAccumulated - target)/100;
             rightFrontSpeed  = power - (zAccumulated - target)/100;
@@ -279,9 +279,7 @@ public class Thunderbot
             telemetry.addData("2. Right", rightFront.getPower());
             telemetry.addData("3. Distance to go", duration + startPosition - leftFront.getCurrentPosition());
 
-            waitOneFullHardwareCycle(); // this error is a public void that was used in the video but it is unknown to us
-                                        // it is meant to wait until for the power adjustment and for the encoder values
-                                        // but the wait time is unknown
+            wait(500); // used to be an unknown wait command from the video
         }
 
         leftFront.setPower(0);
@@ -289,7 +287,7 @@ public class Thunderbot
         leftRear.setPower(0);
         rightRear.setPower(0);
 
-        waitOneFullHardwareCycle(); // same problem as the one above
+        wait(500); // same as the comment above
     }
 
     public void stop()
