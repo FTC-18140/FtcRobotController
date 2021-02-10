@@ -69,7 +69,7 @@ public class Thunderbot
     DcMotor rightRear = null;
 
     static final double     COUNTS_PER_MOTOR_REV    = 28;      // goBuilda 5202 motors
-    static final double     DRIVE_GEAR_REDUCTION    = 3;    // This is < 1.0 if geared UP
+    static final double     DRIVE_GEAR_REDUCTION    = 5;    // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 4.0;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
 
@@ -151,21 +151,15 @@ public class Thunderbot
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
     }
 
-    //method for Driving from a Current Position to a Requested Position
-    public void driveStraight(double speed, double distance, double timeoutS, LinearOpMode caller)
+    // method for Driving from a Current Position to a Requested Position
+    public void encoderDriveStraight(double speed, double distance, double timeoutS, LinearOpMode caller)
     {
 
         driveToPos( speed, distance, distance, timeoutS, caller);
 
     }
 
-    public void pointTurn(double speed, double distance, double timeoutS, LinearOpMode caller)
-    {
-        driveToPos( speed, distance, -distance, timeoutS, caller);
-    }
-
-
-    public void driveToPos(double speed, double lDistance, double rDistance, double timeoutS, LinearOpMode caller )
+    public void driveToPos(double speed, double lDistance, double rDistance, double timeoutS, LinearOpMode caller)
     {
         int newLeftTarget;
         int newRightTarget;
@@ -217,17 +211,20 @@ public class Thunderbot
 
     }
 
+    // checks if the robot is busy
     public boolean isBusy()
     {
         return leftFront.isBusy() && rightFront.isBusy()  && leftRear.isBusy() && rightRear.isBusy();
     }
 
+    // gets the current angle of the robot
     public double updateHeading()
     {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
     }
 
+    // turns for a specific amount of degrees
     public void gyroTurn(double targetHeading, double power)
     {
         double currentAngle = updateHeading();
@@ -248,17 +245,18 @@ public class Thunderbot
         stop();
     }
 
-    public void gyroDriveStraight (int duration, double power) throws InterruptedException{
+    // drives in a straight line for a certain distance in inches
+    public void gyroDriveStraight (int duration, double power){ // removed  "throws InterruptedException"
         double leftFrontSpeed; // creation of speed doubles
         double rightFrontSpeed;
         double leftRearSpeed;
         double rightRearSpeed;
 
-        double target = updateHeading(); // origanaly imu.getInitialZValue
+        double target = updateHeading();
         double startPosition = leftFront.getCurrentPosition(); //getting current position of left front motors encoder
 
-        while (leftFront.getCurrentPosition() < duration + startPosition){ // motor adjustment loop
-            double zAccumulated = updateHeading(); // it was initially an int but was changed to a double
+        while (leftFront.getCurrentPosition() < duration * COUNTS_PER_INCH + startPosition){ // motor adjustment loop
+            double zAccumulated = updateHeading();
 
             leftFrontSpeed = power + (zAccumulated - target)/100;
             rightFrontSpeed  = power - (zAccumulated - target)/100;
@@ -279,7 +277,7 @@ public class Thunderbot
             telemetry.addData("2. Right", rightFront.getPower());
             telemetry.addData("3. Distance to go", duration + startPosition - leftFront.getCurrentPosition());
 
-            wait(500); // used to be an unknown wait command from the video
+            //wait(500); // used to be an unknown wait command from the video
         }
 
         leftFront.setPower(0);
@@ -287,7 +285,7 @@ public class Thunderbot
         leftRear.setPower(0);
         rightRear.setPower(0);
 
-        wait(500); // same as the comment above
+        //wait(500); // same as the comment above
     }
 
     public void stop()

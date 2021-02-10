@@ -39,13 +39,8 @@ import java.util.concurrent.TimeUnit;
 public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
     /* Declare OpMode members. */
-    Thunderbot robot = new Thunderbot();   // Use a Thunderbot's hardware
-    double currentAngle = 0.0;
-    double startAngle = 0.0;
-
-    static final double DRIVE_SPEED = 0.1;
-    static final double TURN_SPEED = 0.2;
-
+    Thunderbot robot = new Thunderbot();   // Use a Thunderbots hardware
+    int state = 0;
 
     @Override
     public void runOpMode() {
@@ -59,14 +54,15 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
         if (opModeIsActive()) {
             // Step through each leg of the path,
             // Note: Reverse movement is obtained by setting a negative distance (not speed)
-            robot.driveStraight(DRIVE_SPEED, -70, 48, this); // go forward 70 inches from start
-            robot.gyroTurn(90, 0.1); // turn 90 degrees left to put wobble arm in position
+            robot.gyroDriveStraight(48, 0.1);
+            robot.gyroTurn(90, 0.1);
             // at this point drop the wobble in the square
-            robot.gyroTurn(90, 0.1); // turn 90 degrees left
-            robot.driveStraight(DRIVE_SPEED, -72, 48, this); // go forward 72 inches back to start
+            //then turn 90 again
+            // go back to start around 70 inches
+            }
 
             telemetry.addData("Path", "Complete");
             telemetry.update();
-        }
+
     }
 }
