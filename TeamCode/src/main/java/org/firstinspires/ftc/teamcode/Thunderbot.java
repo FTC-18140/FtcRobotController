@@ -245,23 +245,37 @@ public class Thunderbot
         stop();
     }
 
+    //checks if gyroTurn has been completed
+    public boolean gyroTurnComp(double target){
+        double currentAngle = updateHeading();
+
+        if (target > currentAngle - 1 && target < currentAngle + 1){ // can change the allowed range of error
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     // drives in a straight line for a certain distance in inches
-    public void gyroDriveStraight (int duration, double power){ // removed  "throws InterruptedException"
+    double gyTarget = 0;
+    double gyStartPosition = 0;
+    public void gyroDriveStraight (double distance, double power){ // removed  "throws InterruptedException"
         double leftFrontSpeed; // creation of speed doubles
         double rightFrontSpeed;
         double leftRearSpeed;
         double rightRearSpeed;
 
-        double target = updateHeading();
-        double startPosition = leftFront.getCurrentPosition(); //getting current position of left front motors encoder
+        gyTarget = updateHeading();
 
-        while (leftFront.getCurrentPosition() < duration * COUNTS_PER_INCH + startPosition){ // motor adjustment loop
+        gyStartPosition = leftFront.getCurrentPosition(); //getting current position of left front motors encoder
+
+        while (leftFront.getCurrentPosition() < distance * COUNTS_PER_INCH + gyStartPosition){ // motor adjustment loop
             double zAccumulated = updateHeading();
 
-            leftFrontSpeed = power + (zAccumulated - target)/100;
-            rightFrontSpeed  = power - (zAccumulated - target)/100;
-            leftRearSpeed  = power + (zAccumulated - target)/100;
-            rightRearSpeed  = power - (zAccumulated - target)/100;
+            leftFrontSpeed = power + (zAccumulated - gyTarget)/100;
+            rightFrontSpeed  = power - (zAccumulated - gyTarget)/100;
+            leftRearSpeed  = power + (zAccumulated - gyTarget)/100;
+            rightRearSpeed  = power - (zAccumulated - gyTarget)/100;
 
             leftFrontSpeed = Range.clip(leftFrontSpeed, -1, 1);
             rightFrontSpeed = Range.clip(rightFrontSpeed, -1, 1);
@@ -275,7 +289,7 @@ public class Thunderbot
 
             telemetry.addData("1. Left", leftFront.getPower());
             telemetry.addData("2. Right", rightFront.getPower());
-            telemetry.addData("3. Distance to go", duration + startPosition - leftFront.getCurrentPosition());
+            telemetry.addData("3. Distance to go", distance + gyStartPosition - leftFront.getCurrentPosition());
 
             //wait(500); // used to be an unknown wait command from the video
         }
@@ -286,6 +300,25 @@ public class Thunderbot
         rightRear.setPower(0);
 
         //wait(500); // same as the comment above
+    }
+
+    //checks if gyroDriveStraight has been completed
+    public boolean gyroDriveStraightComp(double distance){
+        double currentAngle = updateHeading();
+        double currentDistance = leftFront.getCurrentPosition();
+
+        if(currentDistance == gyStartPosition && currentAngle == gyTarget){ // can add an allowed range of error
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void resetEncoders(){
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void stop()

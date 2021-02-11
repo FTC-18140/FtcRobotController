@@ -51,15 +51,41 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        if (opModeIsActive()) {
+        while (opModeIsActive()) {
             // Step through each leg of the path,
             // Note: Reverse movement is obtained by setting a negative distance (not speed)
-            robot.gyroDriveStraight(48, 0.1);
-            robot.gyroTurn(90, 0.1);
-            // at this point drop the wobble in the square
-            //then turn 90 again
-            // go back to start around 70 inches
+            switch (state) {
+
+                // go forward 70 inches
+                case 0:
+                    robot.gyroDriveStraight(70, 0.1);
+                    state++;
+                    break;
+                case 1:
+                    if(robot.gyroDriveStraightComp(70)){
+                        robot.stop();
+                        robot.resetEncoders();
+                        state++;
+                    }
+                    break;
+                    
+                    // turn 90 degrees
+                case 2:
+                    robot.gyroTurn(90, 0.1);
+                    state++;
+                    break;
+                case 3:
+                    if(robot.gyroTurnComp(90)){
+                        robot.stop();
+                        state++;
+                    }
+                    break;
+
+                // at this point drop the wobble in the square
+                //then turn 90 again
+                // go back to start around 70 inches
             }
+        }
 
             telemetry.addData("Path", "Complete");
             telemetry.update();
