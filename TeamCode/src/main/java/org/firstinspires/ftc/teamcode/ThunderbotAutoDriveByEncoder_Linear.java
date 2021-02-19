@@ -34,6 +34,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.Thread.sleep;
+
 @Autonomous(name="Thunderbot: Auto Drive By Encoder", group="Thunderbot")
 //@Disabled
 public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
@@ -43,7 +45,7 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
     int state = 0;
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
 
         //Initialize the drive system variables.
         robot.init(hardwareMap, telemetry);
@@ -53,38 +55,12 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         while (opModeIsActive()) {
             // Step through each leg of the path,
-            // Note: Reverse movement is obtained by setting a negative distance (not speed)
-            switch (state) {
 
-                // go forward 70 inches
-                case 0:
-                    robot.gyroDriveStraight(70, 0.1);
-                    state++;
-                    break;
-                case 1:
-                    if(robot.gyroDriveStraightComp(70)){
-                        robot.stop();
-                        robot.resetEncoders();
-                        state++;
-                    }
-                    break;
-                    
-                    // turn 90 degrees
-                case 2:
-                    robot.gyroTurn(90, 0.1);
-                    state++;
-                    break;
-                case 3:
-                    if(robot.gyroTurnComp(90)){
-                        robot.stop();
-                        state++;
-                    }
-                    break;
+            robot.gyroDriveStraight(70, 0.1); // go forward 70 inches
+            sleep(5000);
+            robot.gyroTurn(90, -0.1); // turn 90 degrees //problem is here
 
-                // at this point drop the wobble in the square
-                //then turn 90 again
-                // go back to start around 70 inches
-            }
+            break;
         }
 
             telemetry.addData("Path", "Complete");
