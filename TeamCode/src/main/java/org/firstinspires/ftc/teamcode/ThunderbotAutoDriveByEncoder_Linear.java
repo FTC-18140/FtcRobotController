@@ -53,13 +53,11 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+        //use sleep when you want the robot to stop for a selected time
         while (opModeIsActive()) {
-            // Step through each leg of the path,
-
-            robot.gyroDriveStraight(70, 0.1); // go forward 70 inches
-            sleep(5000);
-            robot.gyroTurn(90, -0.1); // turn 90 degrees //problem is here
-
+            robot.gyroDriveStraight(70, 0.1, 10); // go forward 70 inches
+            sleep(3000);
+            robot.gyroTurn(90, -0.1, 5); // turn 90 degrees
             break;
         }
 

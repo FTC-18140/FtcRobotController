@@ -156,7 +156,7 @@ public class Thunderbot
 
     // method for Driving from a Current Position to a Requested Position
     // Note: Reverse movement is obtained by setting a negative distance (not speed)
-    public void encoderDriveStraight(double speed, double distance, double timeoutS, LinearOpMode caller) {
+    public void encoderDriveToPosition(double speed, double distance, double timeoutS, LinearOpMode caller) {
 
         driveToPos( speed, distance, distance, timeoutS, caller);
 
@@ -225,7 +225,7 @@ public class Thunderbot
     }
 
     // turns for a specific amount of degrees
-    public void gyroTurn(double targetHeading, double power) {
+    public void gyroTurn(double targetHeading, double power, double timeoutS) {
         gyStartAngle = updateHeading();
         double startAngle = gyStartAngle;
         while(Math.abs(gyStartAngle-startAngle) < targetHeading) { // degrees
@@ -237,9 +237,11 @@ public class Thunderbot
         }
 
             //telemetry for turning in degrees
+        while ((runtime.seconds() < timeoutS) && isBusy() ) {
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            telemetry.addData("Heading: ",angles.firstAngle);
+            telemetry.addData("Heading: ", angles.firstAngle);
             telemetry.update();
+        }
 
         stop();
     }
@@ -247,7 +249,7 @@ public class Thunderbot
 
     // drives in a straight line for a certain distance in inches
     double encStartPosition = 0;
-    public void gyroDriveStraight (double distance, double power) throws InterruptedException{ // removed  "throws InterruptedException"
+    public void gyroDriveStraight (double distance, double power, double timeoutS){
         double leftFrontSpeed; // creation of speed doubles
         double rightFrontSpeed;
         double leftRearSpeed;
@@ -275,10 +277,11 @@ public class Thunderbot
             rightFront.setPower(rightFrontSpeed);
             rightRear.setPower(rightRearSpeed);
 
-            telemetry.addData("1. Left", leftFront.getPower());
-            telemetry.addData("2. Right", rightFront.getPower());
-            telemetry.addData("3. Distance to go", distance + encStartPosition - leftFront.getCurrentPosition());
-
+            while ((runtime.seconds() < timeoutS) && isBusy() ) {
+                telemetry.addData("1. Left", leftFront.getPower());
+                telemetry.addData("2. Right", rightFront.getPower());
+                telemetry.addData("3. Distance to go", distance + encStartPosition - leftFront.getCurrentPosition());
+            }
         }
         stop();
     }
