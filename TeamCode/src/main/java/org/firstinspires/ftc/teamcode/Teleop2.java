@@ -4,7 +4,10 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcontroller.external.samples.SensorDIO;
 
 import static java.lang.Math.abs;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
@@ -17,13 +20,15 @@ public class Teleop2 extends OpMode
     DcMotor leftRear = null;
     DcMotor rightRear = null;
     DcMotor intake;
-    DcMotor rampMotor;
+    DcMotor shooterMotor2;
     DcMotor shooterMotor;
     Servo leftClaw;
     Servo rightClaw;
+    DcMotor armMotor;
+    DigitalChannel digitalTouch;
 
     boolean forwardIntake;
-    boolean ramp;
+    boolean shooter2;
     boolean shooter;
 
     public void init()
@@ -90,13 +95,18 @@ public class Teleop2 extends OpMode
         intake.setDirection(DcMotorSimple.Direction.FORWARD);
         intake.setPower(1);
 
-        rampMotor = hardwareMap.dcMotor.get("rampMotor");
-        rampMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        rampMotor.setPower(.3);
+        shooterMotor2 = hardwareMap.dcMotor.get("shooterMotor2");
+        shooterMotor2.setDirection(DcMotorSimple.Direction.FORWARD);
+        shooterMotor2.setPower(0);
 
         shooterMotor = hardwareMap.dcMotor.get("shooterMotor");
         shooterMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         shooterMotor.setPower(0);
+
+        armMotor = hardwareMap.dcMotor.get("armMotor");
+        armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        armMotor.setPower(0);
+
 
         leftClaw = hardwareMap.servo.get("leftClaw");
         leftClaw.setPosition(0);
@@ -105,12 +115,41 @@ public class Teleop2 extends OpMode
         rightClaw.setPosition(1);
 
 
+        // get a reference to our digitalTouch object.
+        digitalTouch = hardwareMap.get(DigitalChannel.class, "sensor_digital");
+
+        // set the digital channel to input.
+        digitalTouch.setMode(DigitalChannel.Mode.INPUT);
+
 
     }
+
+
     public void start(){}
+
 
     public void loop()
     {
+
+
+        if (digitalTouch.getState() == true) {
+            telemetry.addData("Digital Touch", "Is Not Pressed");
+        } else {
+            telemetry.addData("Digital Touch", "Is Pressed");
+        }
+
+        if (digitalTouch.getState() == true) {
+            armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        } else {
+            armMotor.setPower(0);
+        }
+
+        //arm motor controls
+
+        armMotor.setPower(0);
+        if (gamepad1.left_bumper) {
+            armMotor.setPower(0.3);
+        }
 
 
         //joystick values x and y on left stick; x only on right stick
@@ -128,13 +167,13 @@ public class Teleop2 extends OpMode
         //Ramp motor toggle switch
 
 
-        rampMotor.setPower(0.3);
+        shooterMotor2.setPower(0);
 
-        if (gamepad1.b && !ramp) {
-            if (rampMotor.getPower() == 0.3) rampMotor.setPower(0);
-            else rampMotor.setPower(0.3);
-            ramp = true;
-        } else if (!gamepad1.b) ramp = false;
+        if (gamepad1.a && !shooter2) {
+            if (shooterMotor2.getPower() == 0) shooterMotor2.setPower(1);
+            else shooterMotor2.setPower(0);
+            shooter2 = true;
+        } else if (!gamepad1.a) shooter2 = false;
 
 
         // shooter motor toggle switch
@@ -151,12 +190,14 @@ public class Teleop2 extends OpMode
         //arm claw controls
 
         if (gamepad1.right_bumper) {
-            leftClaw.setPosition(.5);
-            rightClaw.setPosition(.5);
+            leftClaw.setPosition(0.5);
+            rightClaw.setPosition(0.5);
         } else {
             leftClaw.setPosition(0);
             rightClaw.setPosition(1);
         }
+
+
 
         //inverse kinematic transformation
 // to convert your joystick inputs to 4 motor commands:
@@ -190,6 +231,7 @@ public class Teleop2 extends OpMode
         leftRear.setPower(mbackLeft);
 
 
+        telemetry.update();
     }
     public void stop()
     {
@@ -197,6 +239,7 @@ public class Teleop2 extends OpMode
         leftFront.setPower(0.0);
         rightRear.setPower(0.0);
         leftRear.setPower(0.0);
+
     }
 
 
