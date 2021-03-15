@@ -70,6 +70,7 @@ public class Thunderbot
     DcMotor leftRear = null;
     DcMotor rightRear = null;
 
+    // converts inches to motor ticks
     static final double     COUNTS_PER_MOTOR_REV    = 28;      // rev robotics hd hex motors planetary 411600
     static final double     DRIVE_GEAR_REDUCTION    = 5;    // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 4.0;     // For figuring circumference
@@ -121,7 +122,7 @@ public class Thunderbot
             imu = null;
         }
 
-        //Define & Initialize Motors
+        // Define & Initialize Motors
         rightFront = hwMap.dcMotor.get("rightFront");
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -154,18 +155,21 @@ public class Thunderbot
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
     }
 
-    // method for Driving from a Current Position to a Requested Position
+
+    /* Public voids */
+
+    // Method for Driving from a Current Position to a Requested Position
     // Note: Reverse movement is obtained by setting a negative distance (not speed)
     public void encoderDriveToPosition(double speed, double distance, double timeoutS, LinearOpMode caller) {
 
         driveToPos( speed, distance, distance, timeoutS, caller);
-
     }
 
     public void driveToPos(double speed, double lDistance, double rDistance, double timeoutS, LinearOpMode caller) {
         int newLeftTarget;
         int newRightTarget;
 
+        // Convert chosen distance from inches to motor ticks and set each motor to the new target
         newLeftTarget = leftRear.getCurrentPosition() + (int)(lDistance * COUNTS_PER_INCH);
         newRightTarget = rightRear.getCurrentPosition() + (int)(rDistance * COUNTS_PER_INCH);
         leftFront.setTargetPosition(newLeftTarget);
@@ -179,17 +183,15 @@ public class Thunderbot
         leftRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        // reset the timeout time and start motion.
+        // Reset the timeout time and start motion.
         runtime.reset();
         leftFront.setPower(Math.abs(speed));
         rightFront.setPower(Math.abs(speed));
         leftRear.setPower(Math.abs(speed));
         rightRear.setPower(Math.abs(speed));
 
-        while (caller.opModeIsActive() &&
-                (runtime.seconds() < timeoutS) &&
-                isBusy() )
-        {
+        // Telemetry
+        while (caller.opModeIsActive() && (runtime.seconds() < timeoutS) && isBusy()){
 
             // Display it for the driver.
             telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
@@ -201,7 +203,6 @@ public class Thunderbot
             telemetry.update();
         }
 
-
         // Stop the robot because it is done with teh move.
         stop();
 
@@ -210,34 +211,26 @@ public class Thunderbot
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
     }
 
-    // checks if the robot is busy
-    public boolean isBusy() {
-        return leftFront.isBusy() && rightFront.isBusy()  && leftRear.isBusy() && rightRear.isBusy();
-    }
 
-    // gets the current angle of the robot
-    public double updateHeading() {
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
-    }
-
-    // turns for a specific amount of degrees
-    public void gyroTurn(double targetHeading, double power, double timeoutS) {
+    // Turns for a specific amount of degrees
+    // Note:
+    public void gyroTurn(double targetHeading, double power, double timeoutS, LinearOpMode caller) {
         gyStartAngle = updateHeading();
         double startAngle = gyStartAngle;
-        while(Math.abs(gyStartAngle-startAngle) < targetHeading) { // degrees
-            leftFront.setPower(power);// power
+
+        // Repeats until current angle (gyStartAngle) reaches targetHeading relative to startAngle
+        while(Math.abs(gyStartAngle-startAngle) < targetHeading) {
+            leftFront.setPower(power);
             rightFront.setPower(-power);
             leftRear.setPower(power);
             rightRear.setPower(-power);
             gyStartAngle = updateHeading();
         }
 
-            //telemetry for turning in degrees
-        while ((runtime.seconds() < timeoutS) && isBusy() ) {
+        // Telemetry
+        while (caller.opModeIsActive() && (runtime.seconds() < timeoutS) && isBusy()){
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             telemetry.addData("Heading: ", angles.firstAngle);
             telemetry.update();
@@ -247,45 +240,71 @@ public class Thunderbot
     }
 
 
-    // drives in a straight line for a certain distance in inches
+    // Drives in a straight line for a certain distance in inches
+    // Note: can't use to go backwards
     double encStartPosition = 0;
-    public void gyroDriveStraight (double distance, double power, double timeoutS){
-        double leftFrontSpeed; // creation of speed doubles
+    public void gyroDriveStraight (double distance, double power, double timeoutS, LinearOpMode caller){
+
+        // creation of speed doubles
+        double leftFrontSpeed;
         double rightFrontSpeed;
         double leftRearSpeed;
         double rightRearSpeed;
 
+        // Gets starting angle and position of encoders
         gyStartAngle = updateHeading();
+        encStartPosition = leftFront.getCurrentPosition();
 
-        encStartPosition = leftFront.getCurrentPosition(); //getting current position of left front motors encoder
+        while (leftFront.getCurrentPosition() < distance * COUNTS_PER_INCH + encStartPosition) {
+            double currentAngle = updateHeading();
 
-        while (leftFront.getCurrentPosition() < distance * COUNTS_PER_INCH + encStartPosition){ // motor adjustment loop
-            double zAccumulated = updateHeading();
+            // calculates required speed to adjust to gyStartAngle
+            leftFrontSpeed = power + (currentAngle - gyStartAngle) / 100;
+            rightFrontSpeed = power - (currentAngle - gyStartAngle) / 100;
+            leftRearSpeed = power + (currentAngle - gyStartAngle) / 100;
+            rightRearSpeed = power - (currentAngle - gyStartAngle) / 100;
 
-            leftFrontSpeed = power + (zAccumulated - gyStartAngle)/100;
-            rightFrontSpeed  = power - (zAccumulated - gyStartAngle)/100;
-            leftRearSpeed  = power + (zAccumulated - gyStartAngle)/100;
-            rightRearSpeed  = power - (zAccumulated - gyStartAngle)/100;
-
+            // Setting range of adjustments (I may be wrong about this)
             leftFrontSpeed = Range.clip(leftFrontSpeed, -1, 1);
             rightFrontSpeed = Range.clip(rightFrontSpeed, -1, 1);
             leftRearSpeed = Range.clip(leftRearSpeed, -1, 1);
             rightRearSpeed = Range.clip(rightRearSpeed, -1, 1);
 
+            // Set new targets
             leftFront.setPower(leftFrontSpeed);
             leftRear.setPower(leftRearSpeed);
             rightFront.setPower(rightFrontSpeed);
             rightRear.setPower(rightRearSpeed);
-
-            while ((runtime.seconds() < timeoutS) && isBusy() ) {
-                telemetry.addData("1. Left", leftFront.getPower());
-                telemetry.addData("2. Right", rightFront.getPower());
-                telemetry.addData("3. Distance to go", distance + encStartPosition - leftFront.getCurrentPosition());
-            }
         }
+
+            // Telemetry
+            //tried to change it to encoderDriveToPosition telemetry and move out of the while loop
+            while (caller.opModeIsActive() && (runtime.seconds() < timeoutS) && isBusy()){
+                //telemetry.addData("1. Left", leftFront.getPower());
+                //telemetry.addData("2. Right", rightFront.getPower());
+                //telemetry.addData("3. Distance to go", distance + encStartPosition - leftFront.getCurrentPosition());
+                telemetry.addData("Path2",  "Running at %7d :%7d",
+                        leftFront.getCurrentPosition(),
+                        rightFront.getCurrentPosition(),
+                        leftRear.getCurrentPosition(),
+                        rightRear.getCurrentPosition());
+            }
+
         stop();
     }
 
+    // Checks if the robot is busy
+    public boolean isBusy() {
+        return leftFront.isBusy() && rightFront.isBusy()  && leftRear.isBusy() && rightRear.isBusy();
+    }
+
+    // Gets the current angle of the robot
+    public double updateHeading() {
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
+    }
+
+    // Resets all encoders
     public void resetEncoders(){
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -293,8 +312,8 @@ public class Thunderbot
         leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
+    // Stop all motors
     public void stop() {
-        // Stop all motion;
         leftFront.setPower(0);
         rightFront.setPower(0);
         leftRear.setPower(0);
