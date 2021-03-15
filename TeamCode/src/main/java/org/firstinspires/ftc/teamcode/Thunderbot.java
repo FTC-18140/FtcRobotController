@@ -37,6 +37,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.motors.RevRoboticsCoreHexMotor;
+import com.qualcomm.hardware.rev.RevTouchSensor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
 
 import com.qualcomm.robotcore.hardware.DcMotor; // motors
@@ -69,6 +73,15 @@ public class Thunderbot
     DcMotor rightFront = null;
     DcMotor leftRear = null;
     DcMotor rightRear = null;
+    DcMotor armMotor = null;
+
+    Servo leftClaw = null;
+    Servo rightClaw = null;
+
+    TouchSensor touchSensor1 = null;
+    TouchSensor touchSensor2 = null;
+
+
 
     // converts inches to motor ticks
     static final double     COUNTS_PER_MOTOR_REV    = 28;      // rev robotics hd hex motors planetary 411600
@@ -147,6 +160,18 @@ public class Thunderbot
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        armMotor = hwMap.dcMotor.get("armMotor");
+        leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        // Define & Initialize Servos
+        leftClaw = hwMap.servo.get("leftClaw");
+        rightClaw = hwMap.servo.get("rightClaw");
+
+        //  Define & Initialize Sensors
+        touchSensor1 = hwMap.touchSensor.get("touchSensor1");
+        touchSensor2 = hwMap.touchSensor.get("touchSensor2");
+
         telemetry.addData("Status", "Hardware Initialized");
         telemetry.addData("Status", "Encoders Reset");
         telemetry.addData("Status", "Thunderbot Ready");
@@ -160,6 +185,7 @@ public class Thunderbot
 
     // Method for Driving from a Current Position to a Requested Position
     // Note: Reverse movement is obtained by setting a negative distance (not speed)
+    // Note: Use this to go backwards not gyroDriveStraight
     public void encoderDriveToPosition(double speed, double distance, double timeoutS, LinearOpMode caller) {
 
         driveToPos( speed, distance, distance, timeoutS, caller);
@@ -293,16 +319,43 @@ public class Thunderbot
         stop();
     }
 
+
+    public void strafe (){
+
+    }
+
+
+    /*public void wobbleDrop (double power){
+
+        while (touch1 = false){
+            armMotor.setPower(power); // negative and positive powers should change depending on testing
+        }
+
+        leftClaw(off); // find out how to program servos
+        rightClaw(on);
+
+        while (touch2 = false){
+            armMotor.setPower(-power); // negative and positive powers should change depending on testing
+        }
+
+        leftClaw(on); // find out how to program servos
+        rightClaw(off);
+    }
+*/
+
     // Checks if the robot is busy
     public boolean isBusy() {
         return leftFront.isBusy() && rightFront.isBusy()  && leftRear.isBusy() && rightRear.isBusy();
     }
+
+
 
     // Gets the current angle of the robot
     public double updateHeading() {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
     }
+
 
     // Resets all encoders
     public void resetEncoders(){
@@ -311,6 +364,7 @@ public class Thunderbot
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
+
 
     // Stop all motors
     public void stop() {
