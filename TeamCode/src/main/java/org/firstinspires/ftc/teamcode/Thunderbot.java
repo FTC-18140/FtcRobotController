@@ -241,7 +241,7 @@ public class Thunderbot
 
 
     // Turns for a specific amount of degrees
-    // Note:
+    // Note: Negative power = right positive power = left
     public void gyroTurn(double targetHeading, double power, double timeoutS, LinearOpMode caller) {
         gyStartAngle = updateHeading();
         double startAngle = gyStartAngle;
@@ -320,28 +320,52 @@ public class Thunderbot
     }
 
 
-    public void strafe (){
+    public void strafe (){ // will work on this when have time
 
     }
 
-
-    /*public void wobbleDrop (double power){
-
-        while (touch1 = false){
-            armMotor.setPower(power); // negative and positive powers should change depending on testing
+    int hold = 1; // test
+    public void wobbleHold (){
+        while (hold == 1) {
+            leftClaw.setPosition(-0.5);
+            rightClaw.setPosition(-0.5);
         }
-
-        leftClaw(off); // find out how to program servos
-        rightClaw(on);
-
-        while (touch2 = false){
-            armMotor.setPower(-power); // negative and positive powers should change depending on testing
-        }
-
-        leftClaw(on); // find out how to program servos
-        rightClaw(off);
     }
-*/
+
+
+    public void wobbleDrop (double power, double timeoutS) throws InterruptedException {
+        int state = 0;
+
+        while (runtime.seconds() < timeoutS){
+            switch (state){
+                case 0:
+                    while (!touchSensor2.isPressed()){
+                        armMotor.setPower(power);
+                    }
+                    state++;
+
+                case 1:
+                    armMotor.setPower(0);
+                    hold--; // test
+                    state++;
+
+                case 2:
+                    leftClaw.setPosition(0.5);
+                    rightClaw.setPosition(0.5);
+                    state++;
+
+                case 3:
+                    sleep(2000);
+
+                case 4:
+                    while (!touchSensor1.isPressed()){
+                        armMotor.setPower(-power);
+                    }
+                    hold++; // test
+            }
+        }
+    }
+
 
     // Checks if the robot is busy
     public boolean isBusy() {
