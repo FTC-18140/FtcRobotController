@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.SensorDIO;
 
@@ -25,11 +28,15 @@ public class Teleop2 extends OpMode
     Servo leftClaw;
     Servo rightClaw;
     DcMotor armMotor;
+    com.qualcomm.robotcore.hardware.TouchSensor touchSensor1;
+    TouchSensor touchSensor2;
     DigitalChannel digitalTouch;
+    DigitalChannel digitalTouch2;
 
     boolean forwardIntake;
     boolean shooter2;
     boolean shooter;
+
 
     public void init()
     {
@@ -114,12 +121,18 @@ public class Teleop2 extends OpMode
         rightClaw = hardwareMap.servo.get("rightClaw");
         rightClaw.setPosition(1);
 
+        touchSensor1 = hardwareMap.touchSensor.get("touchSensor1");
+        touchSensor2 = hardwareMap.touchSensor.get("touchSensor2");
+
 
         // get a reference to our digitalTouch object.
-        digitalTouch = hardwareMap.get(DigitalChannel.class, "sensor_digital");
+         digitalTouch = hardwareMap.get(DigitalChannel.class, "sensor_digital");
+         digitalTouch2 = hardwareMap.get(DigitalChannel.class, "digital_sensor");
 
         // set the digital channel to input.
         digitalTouch.setMode(DigitalChannel.Mode.INPUT);
+        digitalTouch2.setMode(DigitalChannel.Mode.INPUT);
+
 
 
     }
@@ -132,23 +145,67 @@ public class Teleop2 extends OpMode
     {
 
 
-        if (digitalTouch.getState() == true) {
+/*
+        if (digitalTouch2.getState() == true) {
+            telemetry.addData("Touch Digital", "Is Not Pressed");
+
+        } else {
+            telemetry.addData("Touch Digital", "Is Pressed");
+
+        }
+*/
+
+
+/*        if (digitalTouch.getState() == false) {
             telemetry.addData("Digital Touch", "Is Not Pressed");
         } else {
             telemetry.addData("Digital Touch", "Is Pressed");
         }
 
-        if (digitalTouch.getState() == true) {
-            armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        } else {
+        if (touchSensor2.isPressed()) {
             armMotor.setPower(0);
+
+    }
+        if (touchSensor1.isPressed()) {
+            armMotor.setPower(0);
+if (gamepad1.left_bumper && !touchSensor1.isPressed()) {
+            armMotor.setPower(0.3);
+
+        } else if (touchSensor1.isPressed())
+            {
+            armMotor.setPower(0);
+            armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         }
+        if (gamepad1.left_bumper && !touchSensor2.isPressed()) {
+            armMotor.setPower(0.3);
+
+
+        } else if (touchSensor2.isPressed()){
+            armMotor.setPower(0);
+            armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
+        }
+*/
 
         //arm motor controls
 
-        armMotor.setPower(0);
-        if (gamepad1.left_bumper) {
-            armMotor.setPower(0.3);
+        if (gamepad1.left_bumper && !touchSensor1.isPressed()) {
+            armMotor.setPower(0.7);
+
+
+        } else if (touchSensor1.isPressed())
+            {
+            armMotor.setPower(0);
+            armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        }
+        if (gamepad1.left_bumper && !touchSensor2.isPressed()) {
+            armMotor.setPower(0.7);
+
+
+
+        } else if (touchSensor2.isPressed()) {
+            armMotor.setPower(0);
+            armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         }
 
 
@@ -164,8 +221,15 @@ public class Teleop2 extends OpMode
         } else if (!gamepad1.x) forwardIntake = false;
 
 
-        //Ramp motor toggle switch
+        if (gamepad1.b)
+            armMotor.setPower(0);
 
+        if (!touchSensor2.isPressed() && armMotor.getPower() == 0) {
+            if (gamepad1.y) {
+                armMotor.setPower(-0.5);
+                
+            }
+        }
 
         shooterMotor2.setPower(0);
 
