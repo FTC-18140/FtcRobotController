@@ -29,21 +29,18 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.os.AsyncTask;
-
-import com.qualcomm.hardware.bosch.BNO055IMU; // gyro
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.hardware.motors.RevRoboticsCoreHexMotor;
-import com.qualcomm.hardware.rev.RevTouchSensor;
+
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
 
-import com.qualcomm.robotcore.hardware.DcMotor; // motors
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -51,7 +48,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
@@ -84,9 +80,9 @@ public class Thunderbot
 
 
     // converts inches to motor ticks
-    static final double     COUNTS_PER_MOTOR_REV    = 28;      // rev robotics hd hex motors planetary 411600
-    static final double     DRIVE_GEAR_REDUCTION    = 5;    // This is < 1.0 if geared UP
-    static final double     WHEEL_DIAMETER_INCHES   = 4.0;     // For figuring circumference
+    static final double     COUNTS_PER_MOTOR_REV    = 28; // rev robotics hd hex motors planetary 411600
+    static final double     DRIVE_GEAR_REDUCTION    = 5; // This is < 1.0 if geared UP
+    static final double     WHEEL_DIAMETER_INCHES   = 4.0; // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
 
 
@@ -319,11 +315,58 @@ public class Thunderbot
         stop();
     }
 
+    // Strafes using Mecanum wheels
+    // Note: 
+    public void strafe (double distance, double power, double timeoutS, LinearOpMode caller){
+        int newTarget1;
+        int newTarget2;
 
-    public void strafe (){ // will work on this when have time
+        // Convert chosen distance from inches to motor ticks and set each motor to the new target
+        newTarget1 = leftRear.getCurrentPosition() + (int)(distance * COUNTS_PER_INCH);
+        newTarget2 = rightRear.getCurrentPosition() + (int)(distance * COUNTS_PER_INCH);
+        leftFront.setTargetPosition(-newTarget2);
+        rightFront.setTargetPosition(newTarget1);
+        leftRear.setTargetPosition(newTarget1);
+        rightRear.setTargetPosition(-newTarget2);
 
+        // Turn On RUN_TO_POSITION
+        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // Reset the timeout time and start motion.
+        runtime.reset();
+        leftFront.setPower(-Math.abs(-power));
+        rightFront.setPower(Math.abs(power));
+        leftRear.setPower(Math.abs(power));
+        rightRear.setPower(-Math.abs(-power));
+
+        // Telemetry
+        while (caller.opModeIsActive() && (runtime.seconds() < timeoutS) && isBusy()){
+
+            // Display it for the driver.
+            telemetry.addData("Path1",  "Running to %7d :%7d", newTarget1,  newTarget2);
+            telemetry.addData("Path2",  "Running at %7d :%7d",
+                    leftFront.getCurrentPosition(),
+                    rightFront.getCurrentPosition(),
+                    leftRear.getCurrentPosition(),
+                    rightRear.getCurrentPosition());
+            telemetry.update();
+        }
+
+        // Stop the robot because it is done with teh move.
+        stop();
+
+        // Turn off RUN_TO_POSITION
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
+
+    // Holds wobble goal until wobbleDrop is active
     int hold = 1; // test
     public void wobbleHold (){
         while (hold == 1) {
@@ -332,31 +375,37 @@ public class Thunderbot
         }
     }
 
-
+    // Drops wobble goal
     public void wobbleDrop (double power, double timeoutS) throws InterruptedException {
         int state = 0;
 
         while (runtime.seconds() < timeoutS){
             switch (state){
+
+                    // lower arm until touchSensor2 is inactive
                 case 0:
                     while (!touchSensor2.isPressed()){
                         armMotor.setPower(power);
                     }
                     state++;
 
+                    // stop arm and stop servoHold
                 case 1:
                     armMotor.setPower(0);
                     hold--; // test
                     state++;
 
+                    // open claw
                 case 2:
                     leftClaw.setPosition(0.5);
                     rightClaw.setPosition(0.5);
                     state++;
 
+                    // wait 3 secs
                 case 3:
                     sleep(2000);
 
+                    // raise arm until touchSensor1 is inactive
                 case 4:
                     while (!touchSensor1.isPressed()){
                         armMotor.setPower(-power);
