@@ -141,8 +141,7 @@ public class Teleop2 extends OpMode
     public void start(){}
 
 
-    public void loop()
-    {
+    public void loop() {
 
 
 /*
@@ -193,14 +192,12 @@ if (gamepad1.left_bumper && !touchSensor1.isPressed()) {
             armMotor.setPower(0.7);
 
 
-        } else if (touchSensor1.isPressed())
-            {
+        } else if (touchSensor1.isPressed()) {
             armMotor.setPower(0);
             armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         }
         if (gamepad1.left_bumper && !touchSensor2.isPressed()) {
             armMotor.setPower(0.7);
-
 
 
         } else if (touchSensor2.isPressed()) {
@@ -227,28 +224,27 @@ if (gamepad1.left_bumper && !touchSensor1.isPressed()) {
         if (!touchSensor2.isPressed() && armMotor.getPower() == 0) {
             if (gamepad1.y) {
                 armMotor.setPower(-0.5);
-                
+
             }
         }
 
-        shooterMotor2.setPower(0);
+        if (gamepad1.a) {
 
-        if (gamepad1.a && !shooter2) {
-            if (shooterMotor2.getPower() == 0) shooterMotor2.setPower(1);
-            else shooterMotor2.setPower(0);
-            shooter2 = true;
-        } else if (!gamepad1.a) shooter2 = false;
+            shooterMotor2.setPower(1);
+            shooterMotor.setPower(1);
+
+
+        } else {
+            shooterMotor2.setPower(0);
+            shooterMotor.setPower(0);
+        }
 
 
         // shooter motor toggle switch
 
-        shooterMotor.setPower(0);
 
-        if (gamepad1.a && !shooter) {
-            if (shooterMotor.getPower() == 0) shooterMotor.setPower(1);
-            else shooterMotor.setPower(0);
-            shooter = true;
-        } else if (!gamepad1.a) shooter = false;
+
+
 
 
         //arm claw controls
@@ -260,7 +256,6 @@ if (gamepad1.left_bumper && !touchSensor1.isPressed()) {
             leftClaw.setPosition(0);
             rightClaw.setPosition(1);
         }
-
 
 
         //inverse kinematic transformation
@@ -283,28 +278,22 @@ if (gamepad1.left_bumper && !touchSensor1.isPressed()) {
         if (abs(mbackRight) > max) {
             max = abs(mbackRight);
         }
-        if (max > 0.5) {
-            mfrontLeft/=max;
-            mfrontRight/=max;
-            mbackLeft/=max;
-            mbackRight/=max;
+        if (max > 1) {
+            mfrontLeft /= max;
+            mfrontRight /= max;
+            mbackLeft /= max;
+            mbackRight /= max;
         }
         rightFront.setPower(mfrontRight);
         rightRear.setPower(mbackRight);
         leftFront.setPower(mfrontLeft);
         leftRear.setPower(mbackLeft);
 
+        telemetry.addData("lx: ", gamepad1.left_stick_x);
+        telemetry.addData("ly: ", gamepad1.left_stick_y);
+        telemetry.addData("rx: ", gamepad1.right_stick_x);
+        telemetry.addData("ry: ", gamepad1.right_stick_y);
 
-        telemetry.update();
-    }
-    public void stop()
-    {
-        rightFront.setPower(0.0);
-        leftFront.setPower(0.0);
-        rightRear.setPower(0.0);
-        leftRear.setPower(0.0);
 
     }
-
-
 }
