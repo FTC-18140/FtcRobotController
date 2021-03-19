@@ -49,16 +49,16 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Initialize the drive system variables.
         robot.init(hardwareMap, telemetry);
-        robot.wobbleHold();
 
         // Wait for the game to start (driver presses PLAY)ds
         waitForStart();
 
         // Note: use sleep when you want the robot to stop for a selected time
         while (opModeIsActive()) {
-            robot.gyroDriveStraight(70, 0.1, 10, this); // go forward 70 inches
-            robot.gyroTurn(90, -0.1, 5, this); // turn 90 degrees
-            robot.wobbleDrop(0.8, 20);
+            robot.gyroDriveStraight(70, 0.3); // go forward 70 inches
+           sleep(500);
+           robot.gyroTurn(90, -0.1); // turn 90 degrees
+            //robot.wobbleDrop(0.7, 20);
 
             break;
         }

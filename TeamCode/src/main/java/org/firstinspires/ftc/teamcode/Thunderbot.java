@@ -48,6 +48,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
@@ -69,7 +70,11 @@ public class Thunderbot
     DcMotor rightFront = null;
     DcMotor leftRear = null;
     DcMotor rightRear = null;
+
     DcMotor armMotor = null;
+    DcMotor shooterMotor = null;
+    DcMotor shooterMotor2 = null;
+    DcMotor intake = null;
 
     Servo leftClaw = null;
     Servo rightClaw = null;
@@ -81,14 +86,14 @@ public class Thunderbot
 
     // converts inches to motor ticks
     static final double     COUNTS_PER_MOTOR_REV    = 28; // rev robotics hd hex motors planetary 411600
-    static final double     DRIVE_GEAR_REDUCTION    = 5; // This is < 1.0 if geared UP
+    static final double     DRIVE_GEAR_REDUCTION    = 20; // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 4.0; // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
 
 
     /* local OpMode members. */
-    HardwareMap hwMap           =  null;
-    Telemetry telemetry         =  null;
+    HardwareMap hwMap =  null;
+    private Telemetry telemetry;
     private ElapsedTime runtime  = new ElapsedTime();
 
     /* Gyro */
@@ -157,8 +162,20 @@ public class Thunderbot
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         armMotor = hwMap.dcMotor.get("armMotor");
-        leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        shooterMotor = hwMap.dcMotor.get("shooterMotor");
+        shooterMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        shooterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        shooterMotor2 = hwMap.dcMotor.get("shooterMotor2");
+        shooterMotor2.setDirection(DcMotorSimple.Direction.FORWARD);
+        shooterMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        intake = hwMap.dcMotor.get("intake");
+        intake.setDirection(DcMotorSimple.Direction.FORWARD);
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Define & Initialize Servos
         leftClaw = hwMap.servo.get("leftClaw");
@@ -168,12 +185,11 @@ public class Thunderbot
         touchSensor1 = hwMap.touchSensor.get("touchSensor1");
         touchSensor2 = hwMap.touchSensor.get("touchSensor2");
 
-        telemetry.addData("Status", "Hardware Initialized");
-        telemetry.addData("Status", "Encoders Reset");
-        telemetry.addData("Status", "Thunderbot Ready");
-        telemetry.update();
-
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+
+        // holds wobble goal
+        leftClaw.setPosition(0);
+        rightClaw.setPosition(1);
     }
 
 
@@ -182,14 +198,13 @@ public class Thunderbot
     // Method for Driving from a Current Position to a Requested Position
     // Note: Reverse movement is obtained by setting a negative distance (not speed)
     // Note: Use this to go backwards not gyroDriveStraight
-    public void encoderDriveToPosition(double speed, double distance, double timeoutS, LinearOpMode caller) {
 
-        driveToPos( speed, distance, distance, timeoutS, caller);
-    }
 
-    public void driveToPos(double speed, double lDistance, double rDistance, double timeoutS, LinearOpMode caller) {
+    public void driveToPosition(double speed, double lDistance, double rDistance) {
         int newLeftTarget;
         int newRightTarget;
+
+        resetEncoders();
 
         // Convert chosen distance from inches to motor ticks and set each motor to the new target
         newLeftTarget = leftRear.getCurrentPosition() + (int)(lDistance * COUNTS_PER_INCH);
@@ -213,17 +228,11 @@ public class Thunderbot
         rightRear.setPower(Math.abs(speed));
 
         // Telemetry
-        while (caller.opModeIsActive() && (runtime.seconds() < timeoutS) && isBusy()){
-
-            // Display it for the driver.
-            telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
-            telemetry.addData("Path2",  "Running at %7d :%7d",
-                    leftFront.getCurrentPosition(),
-                    rightFront.getCurrentPosition(),
-                    leftRear.getCurrentPosition(),
-                    rightRear.getCurrentPosition());
-            telemetry.update();
-        }
+        telemetry.addData("leftFront", leftFront.getCurrentPosition()); // this works
+        telemetry.addData("rightFront", rightFront.getCurrentPosition());
+        telemetry.addData("leftRear", leftRear.getCurrentPosition());
+        telemetry.addData("rightRear", rightRear.getCurrentPosition());
+        telemetry.update();
 
         // Stop the robot because it is done with teh move.
         stop();
@@ -238,7 +247,7 @@ public class Thunderbot
 
     // Turns for a specific amount of degrees
     // Note: Negative power = right positive power = left
-    public void gyroTurn(double targetHeading, double power, double timeoutS, LinearOpMode caller) {
+    public void gyroTurn(double targetHeading, double power) {
         gyStartAngle = updateHeading();
         double startAngle = gyStartAngle;
 
@@ -249,15 +258,11 @@ public class Thunderbot
             leftRear.setPower(power);
             rightRear.setPower(-power);
             gyStartAngle = updateHeading();
-        }
 
-        // Telemetry
-        while (caller.opModeIsActive() && (runtime.seconds() < timeoutS) && isBusy()){
-            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            telemetry.addData("Heading: ", angles.firstAngle);
+            // Telemetry
+            telemetry.addData("current angle", updateHeading());
             telemetry.update();
         }
-
         stop();
     }
 
@@ -265,7 +270,7 @@ public class Thunderbot
     // Drives in a straight line for a certain distance in inches
     // Note: can't use to go backwards
     double encStartPosition = 0;
-    public void gyroDriveStraight (double distance, double power, double timeoutS, LinearOpMode caller){
+    public void gyroDriveStraight (double distance, double power){
 
         // creation of speed doubles
         double leftFrontSpeed;
@@ -276,9 +281,11 @@ public class Thunderbot
         // Gets starting angle and position of encoders
         gyStartAngle = updateHeading();
         encStartPosition = leftFront.getCurrentPosition();
+        telemetry.addData("startpos", encStartPosition);
 
-        while (leftFront.getCurrentPosition() < distance * COUNTS_PER_INCH + encStartPosition) {
+        while (leftFront.getCurrentPosition() < (distance * COUNTS_PER_INCH + encStartPosition)) {
             double currentAngle = updateHeading();
+            telemetry.addData("current heading", currentAngle);
 
             // calculates required speed to adjust to gyStartAngle
             leftFrontSpeed = power + (currentAngle - gyStartAngle) / 100;
@@ -297,29 +304,25 @@ public class Thunderbot
             leftRear.setPower(leftRearSpeed);
             rightFront.setPower(rightFrontSpeed);
             rightRear.setPower(rightRearSpeed);
+
+            telemetry.addData("current angle", updateHeading());
+
+            telemetry.addData("leftFront", leftFront.getCurrentPosition()); // this works
+            telemetry.addData("rightFront", rightFront.getCurrentPosition());
+            telemetry.addData("leftRear", leftRear.getCurrentPosition());
+            telemetry.addData("rightRear", rightRear.getCurrentPosition());
+            telemetry.update();
         }
-
-            // Telemetry
-            //tried to change it to encoderDriveToPosition telemetry and move out of the while loop
-            while (caller.opModeIsActive() && (runtime.seconds() < timeoutS) && isBusy()){
-                //telemetry.addData("1. Left", leftFront.getPower());
-                //telemetry.addData("2. Right", rightFront.getPower());
-                //telemetry.addData("3. Distance to go", distance + encStartPosition - leftFront.getCurrentPosition());
-                telemetry.addData("Path2",  "Running at %7d :%7d",
-                        leftFront.getCurrentPosition(),
-                        rightFront.getCurrentPosition(),
-                        leftRear.getCurrentPosition(),
-                        rightRear.getCurrentPosition());
-            }
-
         stop();
     }
 
     // Strafes using Mecanum wheels
-    // Note: 
+    // Note: Negative power and distance goes right. Positive power and distance goes left
     public void strafe (double distance, double power, double timeoutS, LinearOpMode caller){
         int newTarget1;
         int newTarget2;
+
+        resetEncoders();
 
         // Convert chosen distance from inches to motor ticks and set each motor to the new target
         newTarget1 = leftRear.getCurrentPosition() + (int)(distance * COUNTS_PER_INCH);
@@ -343,17 +346,11 @@ public class Thunderbot
         rightRear.setPower(-Math.abs(-power));
 
         // Telemetry
-        while (caller.opModeIsActive() && (runtime.seconds() < timeoutS) && isBusy()){
-
-            // Display it for the driver.
-            telemetry.addData("Path1",  "Running to %7d :%7d", newTarget1,  newTarget2);
-            telemetry.addData("Path2",  "Running at %7d :%7d",
-                    leftFront.getCurrentPosition(),
-                    rightFront.getCurrentPosition(),
-                    leftRear.getCurrentPosition(),
-                    rightRear.getCurrentPosition());
-            telemetry.update();
-        }
+        telemetry.addData("Path2", leftFront.getCurrentPosition()); // this works
+        telemetry.addData("Path2", rightFront.getCurrentPosition());
+        telemetry.addData("Path2", leftRear.getCurrentPosition());
+        telemetry.addData("Path2", rightRear.getCurrentPosition());
+        telemetry.update();
 
         // Stop the robot because it is done with teh move.
         stop();
@@ -365,15 +362,6 @@ public class Thunderbot
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-
-    // Holds wobble goal until wobbleDrop is active
-    int hold = 1; // test
-    public void wobbleHold (){
-        while (hold == 1) {
-            leftClaw.setPosition(-0.5);
-            rightClaw.setPosition(-0.5);
-        }
-    }
 
     // Drops wobble goal
     public void wobbleDrop (double power, double timeoutS) throws InterruptedException {
@@ -392,7 +380,6 @@ public class Thunderbot
                     // stop arm and stop servoHold
                 case 1:
                     armMotor.setPower(0);
-                    hold--; // test
                     state++;
 
                     // open claw
@@ -410,7 +397,6 @@ public class Thunderbot
                     while (!touchSensor1.isPressed()){
                         armMotor.setPower(-power);
                     }
-                    hold++; // test
             }
         }
     }
