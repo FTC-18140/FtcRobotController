@@ -29,51 +29,42 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import org.firstinspires.ftc.robotcore.external.Func;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import java.util.concurrent.TimeUnit;
+
+import static java.lang.Thread.sleep;
 
 @Autonomous(name="Thunderbot: Auto Drive By Encoder", group="Thunderbot")
 //@Disabled
 public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
     /* Declare OpMode members. */
-    Thunderbot robot = new Thunderbot();   // Use a Thunderbot's hardware
-
-    static final double DRIVE_SPEED = 0.6;
-    static final double TURN_SPEED = 0.5;
+    Thunderbot robot = new Thunderbot();   // Use a Thunderbots hardware
+    int state = 0;
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
 
-        //Initialize the drive system variables.
+        // Initialize the drive system variables.
         robot.init(hardwareMap, telemetry);
 
-        // Wait for the game to start (driver presses PLAY)
+        // Wait for the game to start (driver presses PLAY)ds
         waitForStart();
 
-        if (opModeIsActive()) {
-            // Step through each leg of the path,
-            // Note: Reverse movement is obtained by setting a negative distance (not speed)
-            robot.driveStraight(DRIVE_SPEED, 48, 48, this);  // S1: Forward 47 Inches with 5 Sec timeout
-            robot.pointTurn(TURN_SPEED, 48, 48, this);  // S2: Turn Right 12 Inches with 4 Sec timeout
-            robot.driveStraight(DRIVE_SPEED, -50, 50, this);  // S3: Reverse 24 Inches with 4 Sec timeout
+        // Note: use sleep when you want the robot to stop for a selected time
+        while (opModeIsActive()) {
+            robot.gyroDriveStraight(70, 0.3); // go forward 70 inches
+           sleep(500);
+           robot.gyroTurn(90, -0.1); // turn 90 degrees
+            //robot.wobbleDrop(0.7, 20);
+
+            break;
+        }
 
             telemetry.addData("Path", "Complete");
             telemetry.update();
 
-            robot.stop();
-        }
     }
 }
