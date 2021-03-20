@@ -16,6 +16,8 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gam
 @TeleOp(name="Teleop2", group="Teleop")
 public class Teleop2 extends OpMode
 {
+    //motors
+
     DcMotor leftFront = null;
     DcMotor rightFront = null;
     DcMotor leftRear = null;
@@ -23,11 +25,20 @@ public class Teleop2 extends OpMode
     DcMotor intake;
     DcMotor shooterMotor2;
     DcMotor shooterMotor;
+    DcMotor armMotor;
+
+    //servos
+
     Servo leftClaw;
     Servo rightClaw;
-    DcMotor armMotor;
+
+    //touch sensors
+
     TouchSensor touchSensor1;
     TouchSensor touchSensor2;
+
+    //digital channels
+
     DigitalChannel digitalTouch;
     DigitalChannel digitalTouch2;
 
@@ -95,7 +106,7 @@ public class Teleop2 extends OpMode
         }
 
 
-       //Object names
+       //Object motors
 
         intake = hardwareMap.dcMotor.get("intake");
         intake.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -113,11 +124,15 @@ public class Teleop2 extends OpMode
         armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         armMotor.setPower(0);
 
+        //servos for wobble goal arm
+
         leftClaw = hardwareMap.servo.get("leftClaw");
         leftClaw.setPosition(0);
 
         rightClaw = hardwareMap.servo.get("rightClaw");
         rightClaw.setPosition(1);
+
+        //touch sensors
 
         touchSensor1 = hardwareMap.touchSensor.get("touchSensor1");
         touchSensor2 = hardwareMap.touchSensor.get("touchSensor2");
@@ -174,14 +189,17 @@ public class Teleop2 extends OpMode
             armMotor.setPower(0);
         }
 
-        //reverse switch
+//reverse switch
+
         if (!touchSensor2.isPressed() && armMotor.getPower() == 0) {
             if (gamepad1.y) {
                 armMotor.setPower(-0.5);
 
             }
         }
+
 //shooting button
+
         if (gamepad1.a) {
 
             shooterMotor2.setPower(1);
@@ -245,6 +263,6 @@ public class Teleop2 extends OpMode
         telemetry.addData("ry: ", gamepad1.right_stick_y);
 
         telemetry.update();
-
+        
     }
 }
