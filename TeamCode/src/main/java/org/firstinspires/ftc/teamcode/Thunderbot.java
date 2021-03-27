@@ -72,9 +72,15 @@ public class Thunderbot
     DcMotor rightRear = null;
 
     DcMotor armMotor = null;
+
+    DcMotor intake = null;
+    Servo intakeServo = null;
+    Servo intakeServoTwo = null;
+    Servo shooterServo1 = null;
+    Servo shooterServo2 = null;
+    Servo rampServo = null;
     DcMotor shooterMotor = null;
     DcMotor shooterMotor2 = null;
-    DcMotor intake = null;
 
     Servo leftClaw = null;
     Servo rightClaw = null;
@@ -180,6 +186,11 @@ public class Thunderbot
         // Define & Initialize Servos
         leftClaw = hwMap.servo.get("leftClaw");
         rightClaw = hwMap.servo.get("rightClaw");
+        intakeServo = hwMap.servo.get("intakeServo");
+        intakeServoTwo = hwMap.servo.get("intakeServoTwo");
+        shooterServo1 = hwMap.servo.get("shooterServo1");
+        shooterServo2 = hwMap.servo.get("shooterServo2");
+        rampServo = hwMap.servo.get("rampServo");
 
         //  Define & Initialize Sensors
         touchSensor1 = hwMap.touchSensor.get("touchSensor1");
@@ -398,6 +409,23 @@ public class Thunderbot
                         armMotor.setPower(-power);
                     }
             }
+        }
+    }
+
+    public void loadRings(){
+        while () {
+
+        }
+    }
+
+    public void shootRings( double timeoutS) throws InterruptedException {
+        while (runtime.seconds() < timeoutS) {
+            shooterMotor.setPower(1.00);
+            shooterMotor2.setPower(1.00);
+
+            sleep(3000);
+
+            rampServo
         }
     }
 
