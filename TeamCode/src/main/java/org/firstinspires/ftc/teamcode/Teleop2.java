@@ -3,11 +3,13 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+
 
 
 import static java.lang.Math.abs;
@@ -31,6 +33,11 @@ public class Teleop2 extends OpMode
 
     Servo leftClaw;
     Servo rightClaw;
+    Servo rampServo;
+    CRServo intakeServo;
+    CRServo intakeServoTwo;
+    CRServo shooterServo1;
+    CRServo shooterServo2;
 
     //touch sensors
 
@@ -106,7 +113,7 @@ public class Teleop2 extends OpMode
         }
 
 
-       //Object motors
+       //motors
 
         intake = hardwareMap.dcMotor.get("intake");
         intake.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -132,18 +139,38 @@ public class Teleop2 extends OpMode
         rightClaw = hardwareMap.servo.get("rightClaw");
         rightClaw.setPosition(1);
 
+
+        //Servos for intake and shooter
+
+        intakeServoTwo = hardwareMap.crservo.get("intakeServoTwo");
+        intakeServoTwo.setPower(1);
+
+        rampServo = hardwareMap.servo.get("rampServo");
+        rampServo.setPosition(0);
+
+        intakeServo = hardwareMap.crservo.get("intakeServo");
+        intakeServo.setPower(-1);
+
+        shooterServo1 = hardwareMap.crservo.get("shooterServo1");
+        shooterServo1.setPower(-1);
+
+        shooterServo2 = hardwareMap.crservo.get("shooterServo2");
+        shooterServo2.setPower(-1);
+
+
+
         //touch sensors
 
         touchSensor1 = hardwareMap.touchSensor.get("touchSensor1");
         touchSensor2 = hardwareMap.touchSensor.get("touchSensor2");
 
         // get a reference to our digitalTouch object.
-         digitalTouch = hardwareMap.get(DigitalChannel.class, "sensor_digital");
-         digitalTouch2 = hardwareMap.get(DigitalChannel.class, "digital_sensor");
+       //  digitalTouch = hardwareMap.get(DigitalChannel.class, "sensor_digital");
+     //    digitalTouch2 = hardwareMap.get(DigitalChannel.class, "digital_sensor");
 
         // set the digital channel to input.
-        digitalTouch.setMode(DigitalChannel.Mode.INPUT);
-        digitalTouch2.setMode(DigitalChannel.Mode.INPUT);
+       // digitalTouch.setMode(DigitalChannel.Mode.INPUT);
+        //digitalTouch2.setMode(DigitalChannel.Mode.INPUT);
 
     }
 
@@ -152,6 +179,7 @@ public class Teleop2 extends OpMode
 
 
     public void loop() {
+
 
         //arm motor controls
 
@@ -171,6 +199,29 @@ public class Teleop2 extends OpMode
         } else if (touchSensor2.isPressed()) {
             armMotor.setPower(0);
             armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        }
+
+        //Gamepad 2
+
+
+        if (gamepad2.left_bumper && !touchSensor1.isPressed()) {
+            armMotor.setPower(0.7);
+
+
+        } else if (touchSensor1.isPressed()) {
+            armMotor.setPower(0);
+            armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        }
+
+        if (gamepad2.left_bumper && !touchSensor2.isPressed()) {
+            armMotor.setPower(0.7);
+
+
+        } else if (touchSensor2.isPressed()) {
+            armMotor.setPower(0);
+            armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
         }
 
 
@@ -183,16 +234,47 @@ public class Teleop2 extends OpMode
         if (gamepad1.x) {
              intake.setPower(-1);
 
+        } else {
+            intake.setPower(1);
+                    }
+
+//ramp servo
+        if (gamepad1.left_bumper) {
+            rampServo.setPosition(0.3);
+        } else {
+            rampServo.setPosition(0);
         }
 //arm kill switch
         if (gamepad1.b) {
             armMotor.setPower(0);
         }
 
+
+
+
+
+        if (gamepad2.x) {
+            intake.setPower(-1);
+
+        } else {
+            intake.setPower(1);
+        }
+
+//ramp servo
+        if (gamepad2.left_bumper) {
+            rampServo.setPosition(0.3);
+        } else {
+            rampServo.setPosition(0);
+        }
+//arm kill switch
+        if (gamepad2.b) {
+            armMotor.setPower(0);
+        }
+
 //reverse switch
 
         if (!touchSensor2.isPressed() && armMotor.getPower() == 0) {
-            if (gamepad1.y) {
+            if (gamepad2.y) {
                 armMotor.setPower(-0.5);
 
             }
@@ -224,6 +306,35 @@ public class Teleop2 extends OpMode
             rightClaw.setPosition(1);
         }
 
+
+
+// Gamepad2 controls
+
+
+
+        if (gamepad2.a) {
+
+            shooterMotor2.setPower(1);
+            shooterMotor.setPower(1);
+
+        } else {
+
+            shooterMotor2.setPower(0);
+            shooterMotor.setPower(0);
+
+        }
+
+
+        //arm claw controls
+
+        if (gamepad2.right_bumper) {
+            leftClaw.setPosition(0.5);
+            rightClaw.setPosition(0.5);
+        }
+        else {
+            leftClaw.setPosition(0);
+            rightClaw.setPosition(1);
+        }
 
         //inverse kinematic transformation
 // to convert your joystick inputs to 4 motor commands:
