@@ -202,7 +202,7 @@ public class Teleop2 extends OpMode
 
         }
 
-        //Gamepad 2
+        //Gamepad 2 arm controls
 
 
         if (gamepad2.left_bumper && !touchSensor1.isPressed()) {
@@ -247,6 +247,15 @@ public class Teleop2 extends OpMode
 //arm kill switch
         if (gamepad1.b) {
             armMotor.setPower(0);
+        }
+
+        //Shooter servo kill switch
+        if (gamepad1.dpad_up) {
+            shooterServo1.setPower(0);
+            shooterServo2.setPower(0);
+        }else {
+            shooterServo2.setPower(-1);
+            shooterServo1.setPower(-1);
         }
 
 
