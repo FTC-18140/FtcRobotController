@@ -36,6 +36,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
@@ -74,10 +75,10 @@ public class Thunderbot
     DcMotor armMotor = null;
 
     DcMotor intake = null;
-    Servo intakeServo = null;
-    Servo intakeServoTwo = null;
-    Servo shooterServo1 = null;
-    Servo shooterServo2 = null;
+    CRServo intakeServo = null;
+    CRServo intakeServoTwo = null;
+    CRServo shooterServo1 = null;
+    CRServo shooterServo2 = null;
     Servo rampServo = null;
     DcMotor shooterMotor = null;
     DcMotor shooterMotor2 = null;
@@ -186,10 +187,10 @@ public class Thunderbot
         // Define & Initialize Servos
         leftClaw = hwMap.servo.get("leftClaw");
         rightClaw = hwMap.servo.get("rightClaw");
-        intakeServo = hwMap.servo.get("intakeServo");
-        intakeServoTwo = hwMap.servo.get("intakeServoTwo");
-        shooterServo1 = hwMap.servo.get("shooterServo1");
-        shooterServo2 = hwMap.servo.get("shooterServo2");
+        intakeServo = hwMap.crservo.get("intakeServo");
+        intakeServoTwo = hwMap.crservo.get("intakeServoTwo");
+        shooterServo1 = hwMap.crservo.get("shooterServo1");
+        shooterServo2 = hwMap.crservo.get("shooterServo2");
         rampServo = hwMap.servo.get("rampServo");
 
         //  Define & Initialize Sensors
@@ -412,22 +413,29 @@ public class Thunderbot
         }
     }
 
-    public void loadRings(){
-        while () {
-
-        }
-    }
-
-    public void shootRings( double timeoutS) throws InterruptedException {
+    public void intakeRings (double timeoutS){
         while (runtime.seconds() < timeoutS) {
-            shooterMotor.setPower(1.00);
-            shooterMotor2.setPower(1.00);
-
-            sleep(3000);
-
-            rampServo
+            intake.setPower(1.0);
+            intakeServo.setPower(-1.0);
         }
     }
+
+    public void shootRings (double timeoutS) throws InterruptedException {
+        while (runtime.seconds() < timeoutS) {
+            shooterMotor.setPower(1.0);
+            shooterMotor2.setPower(1.0);
+
+            sleep(10000);
+
+            shooterServo1.setPower(-1.0);
+            shooterServo2.setPower(-1.0);
+        }
+    }
+
+    // Pushes rings from ramp to shooter
+    /*public void shootRings2 (){
+        rampServo.setPosition(0.5);
+    }*/
 
 
     // Checks if the robot is busy
