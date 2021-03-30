@@ -259,7 +259,17 @@ public class Teleop2 extends OpMode
         }
 
 
+// gamepad2 controls
 
+
+        //Shooter servo kill switch
+        if (gamepad2.dpad_up) {
+            shooterServo1.setPower(0);
+            shooterServo2.setPower(0);
+        }else {
+            shooterServo2.setPower(-1);
+            shooterServo1.setPower(-1);
+        }
 
 
         if (gamepad2.x) {
