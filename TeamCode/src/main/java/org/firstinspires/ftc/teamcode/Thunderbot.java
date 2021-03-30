@@ -240,7 +240,7 @@ public class Thunderbot
         rightRear.setPower(Math.abs(speed));
 
         // Telemetry
-        telemetry.addData("leftFront", leftFront.getCurrentPosition()); // this works
+        telemetry.addData("leftFront", leftFront.getCurrentPosition());
         telemetry.addData("rightFront", rightFront.getCurrentPosition());
         telemetry.addData("leftRear", leftRear.getCurrentPosition());
         telemetry.addData("rightRear", rightRear.getCurrentPosition());
@@ -376,10 +376,9 @@ public class Thunderbot
 
 
     // Drops wobble goal
-    public void wobbleDrop (double power, double timeoutS) throws InterruptedException {
+    public void wobbleDrop (double power) throws InterruptedException {
         int state = 0;
 
-        while (runtime.seconds() < timeoutS){
             switch (state){
 
                     // lower arm until touchSensor2 is inactive
@@ -409,7 +408,7 @@ public class Thunderbot
                     while (!touchSensor1.isPressed()){
                         armMotor.setPower(-power);
                     }
-            }
+
         }
     }
 
@@ -422,20 +421,13 @@ public class Thunderbot
 
     public void shootRings (double timeoutS) throws InterruptedException {
         while (runtime.seconds() < timeoutS) {
-            shooterMotor.setPower(1.0);
-            shooterMotor2.setPower(1.0);
-
-            sleep(10000);
-
+            sleep(5000);
             shooterServo1.setPower(-1.0);
             shooterServo2.setPower(-1.0);
         }
+        shooterServo1.setPower(0);
+        shooterServo2.setPower(0);
     }
-
-    // Pushes rings from ramp to shooter
-    /*public void shootRings2 (){
-        rampServo.setPosition(0.5);
-    }*/
 
 
     // Checks if the robot is busy
