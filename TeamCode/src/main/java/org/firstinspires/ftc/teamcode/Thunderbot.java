@@ -282,7 +282,7 @@ public class Thunderbot
     // Drives in a straight line for a certain distance in inches
     // Note: can't use to go backwards
     double encStartPosition = 0;
-    public void gyroDriveStraight (double distance, double power){
+    public void gyroDriveForward (double distance, double power){
 
         // creation of speed doubles
         double leftFrontSpeed;
@@ -328,9 +328,54 @@ public class Thunderbot
         stop();
     }
 
+    public void gyroDriveBackward (double distance, double power){
+
+        // creation of speed doubles
+        double leftFrontSpeed;
+        double rightFrontSpeed;
+        double leftRearSpeed;
+        double rightRearSpeed;
+
+        // Gets starting angle and position of encoders
+        gyStartAngle = updateHeading();
+        encStartPosition = leftFront.getCurrentPosition();
+        telemetry.addData("startpos", encStartPosition);
+
+        while (leftFront.getCurrentPosition() < (-distance * COUNTS_PER_INCH + encStartPosition)) {
+            double currentAngle = updateHeading();
+            telemetry.addData("current heading", currentAngle);
+
+            // calculates required speed to adjust to gyStartAngle
+            leftFrontSpeed = power + (currentAngle - gyStartAngle) / 100;
+            rightFrontSpeed = power - (currentAngle - gyStartAngle) / 100;
+            leftRearSpeed = power + (currentAngle - gyStartAngle) / 100;
+            rightRearSpeed = power - (currentAngle - gyStartAngle) / 100;
+
+            // Setting range of adjustments (I may be wrong about this)
+            leftFrontSpeed = Range.clip(leftFrontSpeed, -1, 1);
+            rightFrontSpeed = Range.clip(rightFrontSpeed, -1, 1);
+            leftRearSpeed = Range.clip(leftRearSpeed, -1, 1);
+            rightRearSpeed = Range.clip(rightRearSpeed, -1, 1);
+
+            // Set new targets
+            leftFront.setPower(-leftFrontSpeed);
+            leftRear.setPower(-leftRearSpeed);
+            rightFront.setPower(-rightFrontSpeed);
+            rightRear.setPower(-rightRearSpeed);
+
+            telemetry.addData("current angle", updateHeading());
+
+            telemetry.addData("leftFront", leftFront.getCurrentPosition()); // this works
+            telemetry.addData("rightFront", rightFront.getCurrentPosition());
+            telemetry.addData("leftRear", leftRear.getCurrentPosition());
+            telemetry.addData("rightRear", rightRear.getCurrentPosition());
+            telemetry.update();
+        }
+        stop();
+    }
     // Strafes using Mecanum wheels
     // Note: Negative power and distance goes right. Positive power and distance goes left
-    public void strafe (double distance, double power, double timeoutS, LinearOpMode caller){
+    public void strafe (double distance, double power){
         int newTarget1;
         int newTarget2;
 
@@ -399,20 +444,10 @@ public class Thunderbot
                     rightClaw.setPosition(0.5);
                     state++;
 
-                    // wait 3 secs
-                case 3:
-                    sleep(2000);
-
-                    // raise arm until touchSensor1 is inactive
-                case 4:
-                    while (!touchSensor1.isPressed()){
-                        armMotor.setPower(-power);
-                    }
-
         }
     }
 
-    public void intakeRings (double timeoutS){
+    /*public void intakeRings (double timeoutS){
         while (runtime.seconds() < timeoutS) {
             intake.setPower(1.0);
             intakeServo.setPower(-1.0);
@@ -427,7 +462,7 @@ public class Thunderbot
         }
         shooterServo1.setPower(0);
         shooterServo2.setPower(0);
-    }
+    } */
 
 
     // Checks if the robot is busy
