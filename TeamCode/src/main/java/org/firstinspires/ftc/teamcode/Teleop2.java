@@ -33,7 +33,6 @@ public class Teleop2 extends OpMode
 
     Servo leftClaw;
     Servo rightClaw;
-    Servo rampServo;
     CRServo intakeServo;
     CRServo intakeServoTwo;
     CRServo shooterServo1;
@@ -144,9 +143,6 @@ public class Teleop2 extends OpMode
 
         intakeServoTwo = hardwareMap.crservo.get("intakeServoTwo");
         intakeServoTwo.setPower(1);
-
-        rampServo = hardwareMap.servo.get("rampServo");
-        rampServo.setPosition(0);
 
         intakeServo = hardwareMap.crservo.get("intakeServo");
         intakeServo.setPower(-1);
