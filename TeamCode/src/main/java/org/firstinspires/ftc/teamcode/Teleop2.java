@@ -164,13 +164,7 @@ public class Teleop2 extends OpMode
         touchSensor1 = hardwareMap.touchSensor.get("touchSensor1");
         touchSensor2 = hardwareMap.touchSensor.get("touchSensor2");
 
-        // get a reference to our digitalTouch object.
-       //  digitalTouch = hardwareMap.get(DigitalChannel.class, "sensor_digital");
-     //    digitalTouch2 = hardwareMap.get(DigitalChannel.class, "digital_sensor");
 
-        // set the digital channel to input.
-       // digitalTouch.setMode(DigitalChannel.Mode.INPUT);
-        //digitalTouch2.setMode(DigitalChannel.Mode.INPUT);
 
     }
 
@@ -184,7 +178,7 @@ public class Teleop2 extends OpMode
         //arm motor controls
 
         if (gamepad1.left_bumper && !touchSensor1.isPressed()) {
-            armMotor.setPower(0.7);
+            armMotor.setPower(0.9);
 
 
         } else if (touchSensor1.isPressed()) {
@@ -193,7 +187,7 @@ public class Teleop2 extends OpMode
         }
 
         if (gamepad1.left_bumper && !touchSensor2.isPressed()) {
-            armMotor.setPower(0.7);
+            armMotor.setPower(0.9);
 
 
         } else if (touchSensor2.isPressed()) {
@@ -206,7 +200,7 @@ public class Teleop2 extends OpMode
 
 
         if (gamepad2.left_bumper && !touchSensor1.isPressed()) {
-            armMotor.setPower(0.7);
+            armMotor.setPower(0.9);
 
 
         } else if (touchSensor1.isPressed()) {
@@ -215,7 +209,7 @@ public class Teleop2 extends OpMode
         }
 
         if (gamepad2.left_bumper && !touchSensor2.isPressed()) {
-            armMotor.setPower(0.7);
+            armMotor.setPower(0.9);
 
 
         } else if (touchSensor2.isPressed()) {
@@ -233,18 +227,15 @@ public class Teleop2 extends OpMode
 //intake
         if (gamepad1.x) {
              intake.setPower(-1);
+             intakeServoTwo.setPower(-1);
 
         } else {
             intake.setPower(1);
+            intakeServoTwo.setPower(1);
                     }
 
 //ramp servo
-        if (gamepad1.left_bumper) {
-            rampServo.setPosition(0.3);
-        } else {
-            rampServo.setPosition(0);
-        }
-//arm kill switch
+
         if (gamepad1.b) {
             armMotor.setPower(0);
         }
@@ -274,9 +265,11 @@ public class Teleop2 extends OpMode
 
         if (gamepad2.x) {
             intake.setPower(-1);
+            intakeServoTwo.setPower(-1);
 
         } else {
             intake.setPower(1);
+            intakeServoTwo.setPower(1);
         }
 
 //ramp servo
@@ -294,7 +287,7 @@ public class Teleop2 extends OpMode
 
         if (!touchSensor2.isPressed() && armMotor.getPower() == 0) {
             if (gamepad2.y) {
-                armMotor.setPower(-0.5);
+                armMotor.setPower(-0.9);
 
             }
         }
