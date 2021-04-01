@@ -223,12 +223,9 @@ public class Teleop2 extends OpMode
 //intake
         if (gamepad1.x) {
              intake.setPower(-1);
-             intakeServoTwo.setPower(-1);
-
         } else {
             intake.setPower(1);
-            intakeServoTwo.setPower(1);
-                    }
+                                }
 
 //ramp servo
 
@@ -261,11 +258,8 @@ public class Teleop2 extends OpMode
 
         if (gamepad2.x) {
             intake.setPower(-1);
-            intakeServoTwo.setPower(-1);
-
         } else {
             intake.setPower(1);
-            intakeServoTwo.setPower(1);
         }
         
 //arm kill switch
