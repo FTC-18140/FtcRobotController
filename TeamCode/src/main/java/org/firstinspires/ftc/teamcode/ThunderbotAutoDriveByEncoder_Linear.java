@@ -55,20 +55,33 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Note: use sleep when you want the robot to stop for a selected time
         while (opModeIsActive()){
-            robot.shooterMotor.setPower(0.7); // Start up shooterMotors
-            robot.shooterMotor2.setPower(0.7);
+            robot.shooterMotor.setPower(0.6); // Start up shooterMotors
+            robot.shooterMotor2.setPower(0.6);
 
             robot.gyroDriveForward(64, 0.5); // Go forward 70 inches to line up on the shooting line
 
-            robot.strafeRight(10, 0.4); // Strafe right 10 inches in order to line up the robot to fire the rings
 
-            sleep(4000); // Wait 4 secs to allow the rings to reach full power
+            robot.strafeLeft(10, 0.4); // Strafe left 10 inches in order to line up the robot to fire the rings
+
+            sleep(2000); // Wait 4 secs to allow the rings to reach full power
                                     // Note: this time will be able to be reduced if needed
             robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
             robot.shooterServo2.setPower(-1.0);
-            sleep(3000); // Wait 3 secs to allow all the rings to fire
+            sleep(1000); // Wait 3 secs to allow all the rings to fire
+            robot.shooterServo1.setPower(0);
+            robot.shooterServo2.setPower(0);
 
-            robot.strafeRight(10, 0.4);
+
+            robot.strafeLeft(10, 0.4); // Strafe left 10 inches in order to line up the robot to fire the rings
+
+            sleep(2000); // Wait 4 secs to allow the rings to reach full power
+            // Note: this time will be able to be reduced if needed
+            robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
+            robot.shooterServo2.setPower(-1.0);
+            sleep(2000); // Wait 3 secs to allow all the rings to fire
+
+
+            robot.strafeRight(40, 0.4);
 
             robot.shooterMotor.setPower(0); // Turn off shooterMotors and shooterServos to conserve power
             robot.shooterMotor2.setPower(0);
