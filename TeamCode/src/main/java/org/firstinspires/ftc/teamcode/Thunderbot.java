@@ -66,7 +66,7 @@ import static java.lang.Thread.sleep;
 
 public class Thunderbot
 {
-    /* Public OpMode members. */
+    /** Public OpMode members. */
     DcMotor leftFront = null;
     DcMotor rightFront = null;
     DcMotor leftRear = null;
@@ -98,24 +98,24 @@ public class Thunderbot
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
 
 
-    /* local OpMode members. */
+    /** local OpMode members. */
     HardwareMap hwMap =  null;
     private Telemetry telemetry;
     private ElapsedTime runtime  = new ElapsedTime();
 
-    /* Gyro */
+    /** Gyro */
     BNO055IMU imu = null;
     Orientation angles = null;
 
     static double gyStartAngle = 0; // a shared gyro start position this will be updated using updateHeading()
 
 
-    /* Constructor */
+    /** Constructor */
     public Thunderbot(){
 
     }
 
-    /* Initialize standard Hardware interfaces */
+    /** Initialize standard Hardware interfaces */
     public void init(HardwareMap ahwMap, Telemetry telem) {
         // Save reference to Hardware map
         hwMap = ahwMap;
@@ -205,13 +205,247 @@ public class Thunderbot
     }
 
 
-    /* Public voids */
+    /** Movement methods */
+
+
+    // Turns for a specific amount of degrees
+    // Note: Negative power = right positive power = left
+    public void gyroTurn(double targetHeading, double power) {
+        gyStartAngle = updateHeading();
+        double startAngle = gyStartAngle;
+
+        // Repeats until current angle (gyStartAngle) reaches targetHeading relative to startAngle
+        while(Math.abs(gyStartAngle-startAngle) < targetHeading) {
+            leftFront.setPower(power);
+            rightFront.setPower(-power);
+            leftRear.setPower(power);
+            rightRear.setPower(-power);
+            gyStartAngle = updateHeading();
+
+            // Telemetry
+            telemetry.addData("current angle", updateHeading());
+            telemetry.update();
+        }
+        stop();
+    }
+
+
+    // Drives in a straight line for a certain distance in inches
+    // Note: can't use to go backwards
+    double encStartPosition = 0;
+    public void gyroDriveForward (double distance, double power){
+
+        // Creation of speed doubles
+        double leftFrontSpeed;
+        double rightFrontSpeed;
+        double leftRearSpeed;
+        double rightRearSpeed;
+
+        // Gets starting angle and position of encoders
+        gyStartAngle = updateHeading();
+        encStartPosition = leftFront.getCurrentPosition();
+        telemetry.addData("startPos", encStartPosition);
+
+        while (leftFront.getCurrentPosition() < (distance * COUNTS_PER_INCH + encStartPosition)) {
+            double currentAngle = updateHeading();
+            telemetry.addData("current heading", currentAngle);
+
+            // calculates required speed to adjust to gyStartAngle
+            leftFrontSpeed = power + (currentAngle - gyStartAngle) / 100;
+            rightFrontSpeed = power - (currentAngle - gyStartAngle) / 100;
+            leftRearSpeed = power + (currentAngle - gyStartAngle) / 100;
+            rightRearSpeed = power - (currentAngle - gyStartAngle) / 100;
+
+            // Setting range of adjustments (I may be wrong about this)
+            leftFrontSpeed = Range.clip(leftFrontSpeed, -1, 1);
+            rightFrontSpeed = Range.clip(rightFrontSpeed, -1, 1);
+            leftRearSpeed = Range.clip(leftRearSpeed, -1, 1);
+            rightRearSpeed = Range.clip(rightRearSpeed, -1, 1);
+
+            // Set new targets
+            leftFront.setPower(leftFrontSpeed);
+            leftRear.setPower(leftRearSpeed);
+            rightFront.setPower(rightFrontSpeed);
+            rightRear.setPower(rightRearSpeed);
+
+            telemetry.addData("current angle", updateHeading());
+
+            telemetry.addData("leftFront", leftFront.getCurrentPosition());
+            telemetry.addData("rightFront", rightFront.getCurrentPosition());
+            telemetry.addData("leftRear", leftRear.getCurrentPosition());
+            telemetry.addData("rightRear", rightRear.getCurrentPosition());
+            telemetry.update();
+        }
+        stop();
+    }
+
+    public void gyroDriveBackward (double distance, double power){
+
+        // creation of speed doubles
+        double leftFrontSpeed;
+        double rightFrontSpeed;
+        double leftRearSpeed;
+        double rightRearSpeed;
+
+        // Gets starting angle and position of encoders
+        gyStartAngle = updateHeading();
+        encStartPosition = leftFront.getCurrentPosition();
+        telemetry.addData("startpos", encStartPosition);
+
+        while (leftFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)) {
+            double currentAngle = updateHeading();
+            telemetry.addData("current heading", currentAngle);
+
+            // calculates required speed to adjust to gyStartAngle
+            leftFrontSpeed = power + (currentAngle - gyStartAngle) / 100;
+            rightFrontSpeed = power - (currentAngle - gyStartAngle) / 100;
+            leftRearSpeed = power + (currentAngle - gyStartAngle) / 100;
+            rightRearSpeed = power - (currentAngle - gyStartAngle) / 100;
+
+            // Setting range of adjustments (I may be wrong about this)
+            leftFrontSpeed = Range.clip(leftFrontSpeed, 1, -1);
+            rightFrontSpeed = Range.clip(rightFrontSpeed, 1, -1);
+            leftRearSpeed = Range.clip(leftRearSpeed, 1, -1);
+            rightRearSpeed = Range.clip(rightRearSpeed, 1, -1);
+
+            // Set new targets
+            leftFront.setPower(-leftFrontSpeed);
+            leftRear.setPower(-leftRearSpeed);
+            rightFront.setPower(-rightFrontSpeed);
+            rightRear.setPower(-rightRearSpeed);
+
+            telemetry.addData("current angle", updateHeading());
+
+            telemetry.addData("leftFront", leftFront.getCurrentPosition()); // this works
+            telemetry.addData("rightFront", rightFront.getCurrentPosition());
+            telemetry.addData("leftRear", leftRear.getCurrentPosition());
+            telemetry.addData("rightRear", rightRear.getCurrentPosition());
+            telemetry.update();
+        }
+        stop();
+    }
+
+
+    //
+    public void strafeLeft (double distance, double power) {
+        encStartPosition = leftFront.getCurrentPosition();
+
+        while (leftFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)) { // changed from < to != also added -
+            leftFront.setPower(-power);
+            leftRear.setPower(power);
+            rightFront.setPower(power);
+            rightRear.setPower(-power);
+
+            telemetry.addData("leftFront", leftFront.getCurrentPosition());
+            telemetry.addData("rightFront", rightFront.getCurrentPosition());
+            telemetry.addData("leftRear", leftRear.getCurrentPosition());
+            telemetry.addData("rightRear", rightRear.getCurrentPosition());
+            telemetry.update();
+        }
+        stop();
+    }
+
+
+    //
+    public void strafeRight (double distance, double power) {
+        encStartPosition = leftFront.getCurrentPosition();
+
+        while (leftFront.getCurrentPosition() < (distance * COUNTS_PER_INCH + encStartPosition)) { // changed from < to != also added -
+            leftFront.setPower(power);
+            leftRear.setPower(-power);
+            rightFront.setPower(-power);
+            rightRear.setPower(power);
+
+            telemetry.addData("leftFront", leftFront.getCurrentPosition());
+            telemetry.addData("rightFront", rightFront.getCurrentPosition());
+            telemetry.addData("leftRear", leftRear.getCurrentPosition());
+            telemetry.addData("rightRear", rightRear.getCurrentPosition());
+            telemetry.update();
+        }
+        stop();
+    }
+    /** Attachment methods*/
+
+    // Drops wobble goal
+    public void wobbleDrop (double power) throws InterruptedException {
+        int state = 0;
+
+            switch (state){
+
+                    // lower arm until touchSensor2 is inactive
+                case 0:
+                    while (!touchSensor2.isPressed()){
+                        armMotor.setPower(power);
+                    }
+                    state++;
+
+                    // stop arm and stop servoHold
+                case 1:
+                    armMotor.setPower(0);
+                    state++;
+
+                    // open claw
+                case 2:
+                    leftClaw.setPosition(0.5);
+                    rightClaw.setPosition(0.5);
+                    state++;
+
+        }
+    }
+
+
+
+
+
+
+
+
+    /** Other methods */
+
+    // Gets the current angle of the robot
+    public double updateHeading() {
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
+    }
+
+
+    // Resets all encoders
+    public void resetEncoders(){
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
+
+    // Stop all motors
+    public void stop() {
+        leftFront.setPower(0);
+        rightFront.setPower(0);
+        leftRear.setPower(0);
+        rightRear.setPower(0);
+    }
+
+    /** Unused methods*/
+
+    // Grab rings and move rings to ramp
+    public void intakeRings (double timeoutS){
+        while (runtime.seconds() < timeoutS) {
+            intake.setPower(1.0);
+            intakeServo.setPower(-1.0);
+        }
+    }
+
+
+    // Checks if the robot is busy
+    public boolean isBusy() {
+        return leftFront.isBusy() && rightFront.isBusy()  && leftRear.isBusy() && rightRear.isBusy();
+    }
+
 
     // Method for Driving from a Current Position to a Requested Position
     // Note: Reverse movement is obtained by setting a negative distance (not speed)
     // Note: Use this to go backwards not gyroDriveStraight
-
-
     public void driveToPosition(double speed, double lDistance, double rDistance) {
         int newLeftTarget;
         int newRightTarget;
@@ -256,126 +490,9 @@ public class Thunderbot
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-
-    // Turns for a specific amount of degrees
-    // Note: Negative power = right positive power = left
-    public void gyroTurn(double targetHeading, double power) {
-        gyStartAngle = updateHeading();
-        double startAngle = gyStartAngle;
-
-        // Repeats until current angle (gyStartAngle) reaches targetHeading relative to startAngle
-        while(Math.abs(gyStartAngle-startAngle) < targetHeading) {
-            leftFront.setPower(power);
-            rightFront.setPower(-power);
-            leftRear.setPower(power);
-            rightRear.setPower(-power);
-            gyStartAngle = updateHeading();
-
-            // Telemetry
-            telemetry.addData("current angle", updateHeading());
-            telemetry.update();
-        }
-        stop();
-    }
-
-
-    // Drives in a straight line for a certain distance in inches
-    // Note: can't use to go backwards
-    double encStartPosition = 0;
-    public void gyroDriveForward (double distance, double power){
-
-        // creation of speed doubles
-        double leftFrontSpeed;
-        double rightFrontSpeed;
-        double leftRearSpeed;
-        double rightRearSpeed;
-
-        // Gets starting angle and position of encoders
-        gyStartAngle = updateHeading();
-        encStartPosition = leftFront.getCurrentPosition();
-        telemetry.addData("startpos", encStartPosition);
-
-        while (leftFront.getCurrentPosition() < (distance * COUNTS_PER_INCH + encStartPosition)) {
-            double currentAngle = updateHeading();
-            telemetry.addData("current heading", currentAngle);
-
-            // calculates required speed to adjust to gyStartAngle
-            leftFrontSpeed = power + (currentAngle - gyStartAngle) / 100;
-            rightFrontSpeed = power - (currentAngle - gyStartAngle) / 100;
-            leftRearSpeed = power + (currentAngle - gyStartAngle) / 100;
-            rightRearSpeed = power - (currentAngle - gyStartAngle) / 100;
-
-            // Setting range of adjustments (I may be wrong about this)
-            leftFrontSpeed = Range.clip(leftFrontSpeed, -1, 1);
-            rightFrontSpeed = Range.clip(rightFrontSpeed, -1, 1);
-            leftRearSpeed = Range.clip(leftRearSpeed, -1, 1);
-            rightRearSpeed = Range.clip(rightRearSpeed, -1, 1);
-
-            // Set new targets
-            leftFront.setPower(leftFrontSpeed);
-            leftRear.setPower(leftRearSpeed);
-            rightFront.setPower(rightFrontSpeed);
-            rightRear.setPower(rightRearSpeed);
-
-            telemetry.addData("current angle", updateHeading());
-
-            telemetry.addData("leftFront", leftFront.getCurrentPosition()); // this works
-            telemetry.addData("rightFront", rightFront.getCurrentPosition());
-            telemetry.addData("leftRear", leftRear.getCurrentPosition());
-            telemetry.addData("rightRear", rightRear.getCurrentPosition());
-            telemetry.update();
-        }
-        stop();
-    }
-
-    public void gyroDriveBackward (double distance, double power){
-
-        // creation of speed doubles
-        double leftFrontSpeed;
-        double rightFrontSpeed;
-        double leftRearSpeed;
-        double rightRearSpeed;
-
-        // Gets starting angle and position of encoders
-        gyStartAngle = updateHeading();
-        encStartPosition = leftFront.getCurrentPosition();
-        telemetry.addData("startpos", encStartPosition);
-
-        while (leftFront.getCurrentPosition() < (-distance * COUNTS_PER_INCH + encStartPosition)) {
-            double currentAngle = updateHeading();
-            telemetry.addData("current heading", currentAngle);
-
-            // calculates required speed to adjust to gyStartAngle
-            leftFrontSpeed = power + (currentAngle - gyStartAngle) / 100;
-            rightFrontSpeed = power - (currentAngle - gyStartAngle) / 100;
-            leftRearSpeed = power + (currentAngle - gyStartAngle) / 100;
-            rightRearSpeed = power - (currentAngle - gyStartAngle) / 100;
-
-            // Setting range of adjustments (I may be wrong about this)
-            leftFrontSpeed = Range.clip(leftFrontSpeed, -1, 1);
-            rightFrontSpeed = Range.clip(rightFrontSpeed, -1, 1);
-            leftRearSpeed = Range.clip(leftRearSpeed, -1, 1);
-            rightRearSpeed = Range.clip(rightRearSpeed, -1, 1);
-
-            // Set new targets
-            leftFront.setPower(-leftFrontSpeed);
-            leftRear.setPower(-leftRearSpeed);
-            rightFront.setPower(-rightFrontSpeed);
-            rightRear.setPower(-rightRearSpeed);
-
-            telemetry.addData("current angle", updateHeading());
-
-            telemetry.addData("leftFront", leftFront.getCurrentPosition()); // this works
-            telemetry.addData("rightFront", rightFront.getCurrentPosition());
-            telemetry.addData("leftRear", leftRear.getCurrentPosition());
-            telemetry.addData("rightRear", rightRear.getCurrentPosition());
-            telemetry.update();
-        }
-        stop();
-    }
     // Strafes using Mecanum wheels
     // Note: Negative power and distance goes right. Positive power and distance goes left
-    public void strafe (double distance, double power){
+    public void strafe2 (double distance, double power){
         int newTarget1;
         int newTarget2;
 
@@ -403,10 +520,10 @@ public class Thunderbot
         rightRear.setPower(-Math.abs(-power));
 
         // Telemetry
-        telemetry.addData("Path2", leftFront.getCurrentPosition()); // this works
-        telemetry.addData("Path2", rightFront.getCurrentPosition());
-        telemetry.addData("Path2", leftRear.getCurrentPosition());
-        telemetry.addData("Path2", rightRear.getCurrentPosition());
+        telemetry.addData("leftFront", leftFront.getCurrentPosition()); // this works
+        telemetry.addData("rightFront", rightFront.getCurrentPosition());
+        telemetry.addData("leftRear", leftRear.getCurrentPosition());
+        telemetry.addData("rightRear", rightRear.getCurrentPosition());
         telemetry.update();
 
         // Stop the robot because it is done with teh move.
@@ -417,82 +534,5 @@ public class Thunderbot
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-
-    // Drops wobble goal
-    public void wobbleDrop (double power) throws InterruptedException {
-        int state = 0;
-
-            switch (state){
-
-                    // lower arm until touchSensor2 is inactive
-                case 0:
-                    while (!touchSensor2.isPressed()){
-                        armMotor.setPower(power);
-                    }
-                    state++;
-
-                    // stop arm and stop servoHold
-                case 1:
-                    armMotor.setPower(0);
-                    state++;
-
-                    // open claw
-                case 2:
-                    leftClaw.setPosition(0.5);
-                    rightClaw.setPosition(0.5);
-                    state++;
-
-        }
-    }
-
-    /*public void intakeRings (double timeoutS){
-        while (runtime.seconds() < timeoutS) {
-            intake.setPower(1.0);
-            intakeServo.setPower(-1.0);
-        }
-    }
-
-    public void shootRings (double timeoutS) throws InterruptedException {
-        while (runtime.seconds() < timeoutS) {
-            sleep(5000);
-            shooterServo1.setPower(-1.0);
-            shooterServo2.setPower(-1.0);
-        }
-        shooterServo1.setPower(0);
-        shooterServo2.setPower(0);
-    } */
-
-
-    // Checks if the robot is busy
-    public boolean isBusy() {
-        return leftFront.isBusy() && rightFront.isBusy()  && leftRear.isBusy() && rightRear.isBusy();
-    }
-
-
-
-    // Gets the current angle of the robot
-    public double updateHeading() {
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
-    }
-
-
-    // Resets all encoders
-    public void resetEncoders(){
-        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    }
-
-
-    // Stop all motors
-    public void stop() {
-        leftFront.setPower(0);
-        rightFront.setPower(0);
-        leftRear.setPower(0);
-        rightRear.setPower(0);
     }
 }
