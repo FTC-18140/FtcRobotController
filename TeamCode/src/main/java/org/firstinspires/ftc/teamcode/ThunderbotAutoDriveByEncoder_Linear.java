@@ -55,8 +55,8 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Note: use sleep when you want the robot to stop for a selected time
         while (opModeIsActive()){
-            robot.shooterMotor.setPower(0.6); // Start up shooterMotors
-            robot.shooterMotor2.setPower(0.6);
+            robot.shooterMotor.setPower(0.64); // Start up shooterMotors
+            robot.shooterMotor2.setPower(0.64);
 
             robot.gyroDriveForward(64, 0.5); // Go forward 70 inches to line up on the shooting line
 
@@ -72,7 +72,7 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
             robot.shooterServo2.setPower(0);
 
 
-            robot.strafeLeft(10, 0.4); // Strafe left 10 inches in order to line up the robot to fire the rings
+            robot.strafeLeft(8, 0.4); // Strafe left 10 inches in order to line up the robot to fire the rings
 
             sleep(2000); // Wait 4 secs to allow the rings to reach full power
             // Note: this time will be able to be reduced if needed
