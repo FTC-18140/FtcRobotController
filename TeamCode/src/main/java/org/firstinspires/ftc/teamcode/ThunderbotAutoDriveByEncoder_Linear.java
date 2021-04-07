@@ -36,6 +36,10 @@ import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.sleep;
 
+
+// slow down some parts of the code and try to lower some cool downs
+// add a sensor  to increase accuracy (light sensor, gyro for strafe, voltage, etc.)
+
 @Autonomous(name="Thunderbot: Auto Drive By Encoder", group="Thunderbot")
 //@Disabled
 public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
