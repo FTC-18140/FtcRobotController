@@ -59,6 +59,7 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Note: use sleep when you want the robot to stop for a selected time
         while (opModeIsActive()){
+
             robot.shooterMotor.setPower(0.64); // Start up shooterMotors
             robot.shooterMotor2.setPower(0.64);
 

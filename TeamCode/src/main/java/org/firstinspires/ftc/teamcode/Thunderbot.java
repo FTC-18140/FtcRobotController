@@ -207,15 +207,40 @@ public class Thunderbot
 
     /** Movement methods */
 
+    // Turns until distance sensor detects object
+    public void findObject(String direction, double power){
+
+        
+        case right:
+        while(!see){
+            leftFront.setPower(power);
+            rightFront.setPower(-power);
+            leftRear.setPower(power);
+            rightRear.setPower(-power);
+        }
+    }
+
+
+    // Moves towards target until within a certain distance. Stays on track using the distance sensor
+    public void travelToObject (double power){
+
+    }
+
+
+    // Follows a line using the color sensors
+    public void lineFollow (String color, double distance, double power){
+
+    }
+
 
     // Turns for a specific amount of degrees
     // Note: Negative power = right positive power = left
-    public void gyroTurn(double targetHeading, double power) {
+    public void gyroTurn(double targetHeading, double power){
         gyStartAngle = updateHeading();
         double startAngle = gyStartAngle;
 
         // Repeats until current angle (gyStartAngle) reaches targetHeading relative to startAngle
-        while(Math.abs(gyStartAngle-startAngle) < targetHeading) {
+        while(Math.abs(gyStartAngle-startAngle) < targetHeading){
             leftFront.setPower(power);
             rightFront.setPower(-power);
             leftRear.setPower(power);
@@ -246,7 +271,7 @@ public class Thunderbot
         encStartPosition = leftFront.getCurrentPosition();
         telemetry.addData("startPos", encStartPosition);
 
-        while (leftFront.getCurrentPosition() < (distance * COUNTS_PER_INCH + encStartPosition)) {
+        while (leftFront.getCurrentPosition() < (distance * COUNTS_PER_INCH + encStartPosition)){
             double currentAngle = updateHeading();
             telemetry.addData("current heading", currentAngle);
 
@@ -279,6 +304,7 @@ public class Thunderbot
         stop();
     }
 
+
     public void gyroDriveBackward (double distance, double power){
 
         // creation of speed doubles
@@ -292,7 +318,7 @@ public class Thunderbot
         encStartPosition = leftFront.getCurrentPosition();
         telemetry.addData("startpos", encStartPosition);
 
-        while (leftFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)) {
+        while (leftFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)){
             double currentAngle = updateHeading();
             telemetry.addData("current heading", currentAngle);
 
@@ -326,11 +352,11 @@ public class Thunderbot
     }
 
 
-    //
-    public void strafeLeft (double distance, double power) {
+    // Drives left using Mecanum
+    public void strafeLeft (double distance, double power){
         encStartPosition = leftFront.getCurrentPosition();
 
-        while (leftFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)) { // changed from < to != also added -
+        while (leftFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)){ // changed from < to != also added -
             leftFront.setPower(-power);
             leftRear.setPower(power);
             rightFront.setPower(power);
@@ -346,11 +372,11 @@ public class Thunderbot
     }
 
 
-    //
-    public void strafeRight (double distance, double power) {
+    // Drives right using Mecanum
+    public void strafeRight (double distance, double power){
         encStartPosition = leftFront.getCurrentPosition();
 
-        while (leftFront.getCurrentPosition() < (distance * COUNTS_PER_INCH + encStartPosition)) { // changed from < to != also added -
+        while (leftFront.getCurrentPosition() < (distance * COUNTS_PER_INCH + encStartPosition)){ // changed from < to != also added -
             leftFront.setPower(power);
             leftRear.setPower(-power);
             rightFront.setPower(-power);
@@ -364,10 +390,11 @@ public class Thunderbot
         }
         stop();
     }
-    /** Attachment methods*/
 
+
+    /** Attachment methods*/
     // Drops wobble goal
-    public void wobbleDrop (double power) throws InterruptedException {
+    public void wobbleDrop (double power){
         int state = 0;
 
             switch (state){
@@ -394,16 +421,9 @@ public class Thunderbot
     }
 
 
-
-
-
-
-
-
     /** Other methods */
-
     // Gets the current angle of the robot
-    public double updateHeading() {
+    public double updateHeading(){
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return -AngleUnit.DEGREES.normalize(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
     }
@@ -419,15 +439,15 @@ public class Thunderbot
 
 
     // Stop all motors
-    public void stop() {
+    public void stop(){
         leftFront.setPower(0);
         rightFront.setPower(0);
         leftRear.setPower(0);
         rightRear.setPower(0);
     }
 
-    /** Unused methods*/
 
+    /** Unused methods*/
     // Grab rings and move rings to ramp
     public void intakeRings (double timeoutS){
         while (runtime.seconds() < timeoutS) {
