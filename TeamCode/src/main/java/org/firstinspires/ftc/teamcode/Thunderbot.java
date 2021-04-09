@@ -210,7 +210,13 @@ public class Thunderbot
     // Turns until distance sensor detects object
     public void findObject(String direction, double power){
 
-        
+        case left:
+        while(!see){
+            leftFront.setPower(-power);
+            rightFront.setPower(power);
+            leftRear.setPower(-power);
+            rightRear.setPower(power);
+
         case right:
         while(!see){
             leftFront.setPower(power);
@@ -229,6 +235,7 @@ public class Thunderbot
 
     // Follows a line using the color sensors
     public void lineFollow (String color, double distance, double power){
+
 
     }
 
