@@ -29,6 +29,9 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -89,7 +92,17 @@ public class Thunderbot
     TouchSensor touchSensor1 = null;
     TouchSensor touchSensor2 = null;
 
+    // For state machines
+    enum autoStates {
+        Right,
+        Left,
+        KeepGoing,
+        Grab
+    }
 
+    enum autoIfStateFails {
+
+    }
 
     // converts inches to motor ticks
     static final double     COUNTS_PER_MOTOR_REV    = 28; // rev robotics hd hex motors planetary 411600
@@ -205,40 +218,168 @@ public class Thunderbot
     }
 
 
-    /** Movement methods */
+    /** Methods in progress */
 
     // Turns until distance sensor detects object
-    public void findObject(String direction, double power){
+    public void findObject (autoStates direction, double power){
 
-        case left:
-        while(!see){
+        switch(direction){
+
+        case Left:
+        while (distanceSensor.getDistance(DistanceUnit.INCH) < 15){ // Change the number if needed
             leftFront.setPower(-power);
             rightFront.setPower(power);
             leftRear.setPower(-power);
             rightRear.setPower(power);
+        }
 
-        case right:
-        while(!see){
+        case Right:
+        while (distanceSensor.getDistance(DistanceUnit.INCH) < 15){ // Change the number if needed
             leftFront.setPower(power);
             rightFront.setPower(-power);
             leftRear.setPower(power);
             rightRear.setPower(-power);
+            }
+
         }
     }
 
 
     // Moves towards target until within a certain distance. Stays on track using the distance sensor
-    public void travelToObject (double power){
+    // Note: possibly replaces findObject
+    public void travelToObject (autoStates command, double minDistance, double maxDistance, double power) throws InterruptedException {
 
+        switch (command) {
+
+            case KeepGoing:
+                while (distanceSensor.getDistance(DistanceUnit.INCH) < maxDistance){ // this needs changing
+
+                    if (distanceSensor.getDistance(DistanceUnit.INCH) < minDistance){
+                        while (distanceSensor.getDistance(DistanceUnit.INCH) < minDistance) {
+                            leftFront.setPower(power);
+                            rightFront.setPower(power);
+                            leftRear.setPower(power);
+                            rightRear.setPower(power);
+                        }
+                    } else {
+                       command = autoStates.Grab;
+                    }
+                }
+                command = autoStates.Left;
+
+            case Left:
+                gyStartAngle = updateHeading();
+                double startAngle = gyStartAngle;
+
+                while (distanceSensor.getDistance(DistanceUnit.INCH) > maxDistance){ // Change the number if needed
+
+                    if (Math.abs(gyStartAngle-startAngle) < 90){
+                        command = autoStates.Right;
+                    }
+                        leftFront.setPower(-power);
+                        rightFront.setPower(power);
+                        leftRear.setPower(-power);
+                        rightRear.setPower(power);
+                        gyStartAngle = updateHeading();
+                }
+                command = autoStates.KeepGoing;
+
+            case Right:
+                while (distanceSensor.getDistance(DistanceUnit.INCH) > maxDistance){ // Change the number if needed
+                    leftFront.setPower(-power);
+                    rightFront.setPower(power);
+                    leftRear.setPower(-power);
+                    rightRear.setPower(power);
+                }
+                command = autoStates.KeepGoing;
+
+            case Grab:
+                stop();
+                leftClaw.setPosition(0);
+                rightClaw.setPosition(1);
+        }
     }
 
 
     // Follows a line using the color sensors
-    public void lineFollow (String color, double distance, double power){
+    public void lineFollowRight (double distance, double power){
+
+        while (leftFront.getCurrentPosition() < (distance * COUNTS_PER_INCH + encStartPosition)){
+            double black = 0; // Change when you know the value for black and white
+            double white = 0;
+
+            if (leftColor == white && rightColor == white){
+                leftFront.setPower(power);
+                leftRear.setPower(-power);
+                rightFront.setPower(-power);
+                rightRear.setPower(power);
+
+            } else if (leftColor == white && rightColor == black){
+                leftFront.setPower(power);
+                leftRear.setPower(-power);
+                rightFront.setPower(-power + 0.1);
+                rightRear.setPower(power + 0.1);
+
+            } else if (leftColor == black && rightColor == white){
+                leftFront.setPower(power + 0.1);
+                leftRear.setPower(-power + 0.1);
+                rightFront.setPower(-power);
+                rightRear.setPower(power);
+
+            } else {
+                break; // Change when observe when both sensors see black
+            }
 
 
+            telemetry.addData("leftFront", leftFront.getCurrentPosition());
+            telemetry.addData("rightFront", rightFront.getCurrentPosition());
+            telemetry.addData("leftRear", leftRear.getCurrentPosition());
+            telemetry.addData("rightRear", rightRear.getCurrentPosition());
+            telemetry.update();
+        }
+        stop();
     }
 
+
+    public void lineFollowLeft (double distance, double power){
+
+        while (leftFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)){
+            double black = 0; // Change when you know the value for black and white
+            double white = 0;
+
+            if (leftColor == white && rightColor == white){
+                leftFront.setPower(-power);
+                leftRear.setPower(power);
+                rightFront.setPower(power);
+                rightRear.setPower(-power);
+
+            } else if (leftColor == white && rightColor == black){
+                leftFront.setPower(-power);
+                leftRear.setPower(power);
+                rightFront.setPower(power + 0.1);
+                rightRear.setPower(-power + 0.1);
+
+            } else if (leftColor == black && rightColor == white){
+                leftFront.setPower(-power + 0.1);
+                leftRear.setPower(power + 0.1);
+                rightFront.setPower(power);
+                rightRear.setPower(-power);
+
+            } else {
+                break; // Change when observe when both sensors see black
+            }
+
+
+            telemetry.addData("leftFront", leftFront.getCurrentPosition());
+            telemetry.addData("rightFront", rightFront.getCurrentPosition());
+            telemetry.addData("leftRear", leftRear.getCurrentPosition());
+            telemetry.addData("rightRear", rightRear.getCurrentPosition());
+            telemetry.update();
+        }
+        stop();
+    }
+
+    /** Movement methods */
 
     // Turns for a specific amount of degrees
     // Note: Negative power = right positive power = left

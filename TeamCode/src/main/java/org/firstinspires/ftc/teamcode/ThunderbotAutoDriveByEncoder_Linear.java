@@ -60,7 +60,8 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
         // Note: use sleep when you want the robot to stop for a selected time
         while (opModeIsActive()){
 
-            robot.shooterMotor.setPower(0.64); // Start up shooterMotors
+
+            /*robot.shooterMotor.setPower(0.64); // Start up shooterMotors
             robot.shooterMotor2.setPower(0.64);
 
             robot.gyroDriveForward(64, 0.5); // Go forward 70 inches to line up on the shooting line
@@ -115,7 +116,7 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
             robot.gyroDriveBackward(35, 0.5); // Drive backwards 35 inches to the shooter line and square A
 
             robot.gyroTurn(80, 0.2); // Turn 80 degrees left in order to drop the wobble in the middle of square A
-
+            */
             break;
         }
 
