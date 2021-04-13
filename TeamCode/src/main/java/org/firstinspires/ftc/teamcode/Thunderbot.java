@@ -91,6 +91,8 @@ public class Thunderbot
 
     TouchSensor touchSensor1 = null;
     TouchSensor touchSensor2 = null;
+    ColorSensor leftColor = null;
+    ColorSensor rightColor = null;
 
     // For state machines
     enum autoStates {
@@ -204,11 +206,13 @@ public class Thunderbot
         intakeServoTwo = hwMap.crservo.get("intakeServoTwo");
         shooterServo1 = hwMap.crservo.get("shooterServo1");
         shooterServo2 = hwMap.crservo.get("shooterServo2");
-        rampServo = hwMap.servo.get("rampServo");
+        //rampServo = hwMap.servo.get("rampServo");
 
         //  Define & Initialize Sensors
         touchSensor1 = hwMap.touchSensor.get("touchSensor1");
         touchSensor2 = hwMap.touchSensor.get("touchSensor2");
+        leftColor = hwMap.colorSensor.get("rightColor"); // Note: swapping left and right makes it easier on autonomous
+        rightColor = hwMap.colorSensor.get("leftColor");
 
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
@@ -221,7 +225,7 @@ public class Thunderbot
     /** Methods in progress */
 
     // Turns until distance sensor detects object
-    public void findObject (autoStates direction, double power){
+   /* public void findObject (autoStates direction, double power){
 
         switch(direction){
 
@@ -308,19 +312,19 @@ public class Thunderbot
             double black = 0; // Change when you know the value for black and white
             double white = 0;
 
-            if (leftColor == white && rightColor == white){
+            if (leftColor = white && rightColor = white){
                 leftFront.setPower(power);
                 leftRear.setPower(-power);
                 rightFront.setPower(-power);
                 rightRear.setPower(power);
 
-            } else if (leftColor == white && rightColor == black){
+            } else if (leftColor = white && rightColor = black){
                 leftFront.setPower(power);
                 leftRear.setPower(-power);
                 rightFront.setPower(-power + 0.1);
                 rightRear.setPower(power + 0.1);
 
-            } else if (leftColor == black && rightColor == white){
+            } else if (leftColor = black && rightColor = white){
                 leftFront.setPower(power + 0.1);
                 leftRear.setPower(-power + 0.1);
                 rightFront.setPower(-power);
@@ -339,36 +343,43 @@ public class Thunderbot
         }
         stop();
     }
-
+*/
 
     public void lineFollowLeft (double distance, double power){
 
         while (leftFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)){
             double black = 0; // Change when you know the value for black and white
-            double white = 0;
+            int white = 0;
 
-            if (leftColor == white && rightColor == white){
+
+            if (leftColor.alpha() > 190 && rightColor.alpha() > 190){
                 leftFront.setPower(-power);
                 leftRear.setPower(power);
                 rightFront.setPower(power);
                 rightRear.setPower(-power);
 
-            } else if (leftColor == white && rightColor == black){
+            } else if (leftColor.alpha() > 190 && rightColor.alpha() < 190){
                 leftFront.setPower(-power);
                 leftRear.setPower(power);
                 rightFront.setPower(power + 0.1);
                 rightRear.setPower(-power + 0.1);
 
-            } else if (leftColor == black && rightColor == white){
+            } else if (leftColor.alpha() < 190 && rightColor.alpha() > 190){
                 leftFront.setPower(-power + 0.1);
                 leftRear.setPower(power + 0.1);
                 rightFront.setPower(power);
                 rightRear.setPower(-power);
 
             } else {
-                break; // Change when observe when both sensors see black
+                leftFront.setPower(-power - 0.1);
+                leftRear.setPower(power - 0.1);
+                rightFront.setPower(power - 0.1);
+                rightRear.setPower(-power -0.1);
             }
 
+
+            telemetry.addData("right Alpha", rightColor.alpha());
+            telemetry.addData("right Alpha", rightColor.alpha());
 
             telemetry.addData("leftFront", leftFront.getCurrentPosition());
             telemetry.addData("rightFront", rightFront.getCurrentPosition());
