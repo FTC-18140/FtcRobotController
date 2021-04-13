@@ -35,6 +35,7 @@ public class  Teleop2 extends OpMode
     Servo rightClaw;
     CRServo intakeServo;
     CRServo intakeServoTwo;
+    CRServo rampIntakeServo;
     CRServo shooterServo1;
     CRServo shooterServo2;
 
@@ -147,6 +148,9 @@ public class  Teleop2 extends OpMode
         intakeServo = hardwareMap.crservo.get("intakeServo");
         intakeServo.setPower(-1);
 
+        rampIntakeServo = hardwareMap.crservo.get("rampIntakeServo");
+        rampIntakeServo.setPower(-1);
+
         shooterServo1 = hardwareMap.crservo.get("shooterServo1");
         shooterServo1.setPower(-1);
 
@@ -221,10 +225,12 @@ public class  Teleop2 extends OpMode
         double clockwise = -gamepad1.right_stick_x;   // push right joystick to the right to rotate clockwise
 
 //intake
-        if (gamepad1.x) {
+        if (gamepad2.x) {
              intake.setPower(-1);
+             rampIntakeServo.setPower(1);
         } else {
             intake.setPower(1);
+            rampIntakeServo.setPower(-1);
                                 }
 
 //ramp servo
@@ -256,12 +262,8 @@ public class  Teleop2 extends OpMode
         }
 
 
-        if (gamepad2.x) {
-            intake.setPower(-1);
-        } else {
-            intake.setPower(1);
-        }
-        
+
+
 //arm kill switch
         if (gamepad2.b) {
             armMotor.setPower(0);
@@ -280,7 +282,7 @@ public class  Teleop2 extends OpMode
 
         if (gamepad1.a) {
 
-            shooterMotor2.setPower(1);
+            shooterMotor2.setPower(.8);
             shooterMotor.setPower(1);
 
         } else {
@@ -310,7 +312,7 @@ public class  Teleop2 extends OpMode
 
         if (gamepad2.a) {
 
-            shooterMotor2.setPower(1);
+            shooterMotor2.setPower(.8);
             shooterMotor.setPower(1);
 
         } else {
