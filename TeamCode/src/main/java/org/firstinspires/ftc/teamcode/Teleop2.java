@@ -227,10 +227,10 @@ public class  Teleop2 extends OpMode
 //intake
         if (gamepad2.x) {
              intake.setPower(-1);
-             rampIntakeServo.setPower(1);
+
         } else {
             intake.setPower(1);
-            rampIntakeServo.setPower(-1);
+
                                 }
 
 //ramp servo

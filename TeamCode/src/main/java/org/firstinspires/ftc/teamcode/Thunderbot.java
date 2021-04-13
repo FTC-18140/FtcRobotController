@@ -79,6 +79,7 @@ public class Thunderbot
     CRServo intakeServoTwo = null;
     CRServo shooterServo1 = null;
     CRServo shooterServo2 = null;
+    CRServo rampIntakeServo = null;
     DcMotor shooterMotor = null;
     DcMotor shooterMotor2 = null;
 
@@ -190,6 +191,7 @@ public class Thunderbot
         intakeServoTwo = hwMap.crservo.get("intakeServoTwo");
         shooterServo1 = hwMap.crservo.get("shooterServo1");
         shooterServo2 = hwMap.crservo.get("shooterServo2");
+        rampIntakeServo = hwMap.crservo.get("rampIntakeServo");
 
         //  Define & Initialize Sensors
         touchSensor1 = hwMap.touchSensor.get("touchSensor1");
