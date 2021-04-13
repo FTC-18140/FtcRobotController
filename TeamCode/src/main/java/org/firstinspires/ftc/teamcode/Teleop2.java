@@ -16,7 +16,7 @@ import static java.lang.Math.abs;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
 
 @TeleOp(name="Teleop2", group="Teleop")
-public class Teleop2 extends OpMode
+public class  Teleop2 extends OpMode
 {
     //motors
 

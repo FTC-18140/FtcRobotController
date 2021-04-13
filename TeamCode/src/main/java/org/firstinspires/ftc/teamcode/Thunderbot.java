@@ -205,7 +205,6 @@ public class Thunderbot
 
     /** Movement methods */
 
-
     // Turns for a specific amount of degrees
     // Note: Negative power = right positive power = left
     public void gyroTurn(double targetHeading, double power) {
