@@ -345,23 +345,66 @@ public class Thunderbot
     }
 */
 
-    public void lineFollowLeft (double distance, double power){
+    public void lineFollowRight (double distance, double power) {
+
+        encStartPosition = leftFront.getCurrentPosition();
+        while (leftFront.getCurrentPosition() < (distance * COUNTS_PER_INCH + encStartPosition)) {
+            if (leftColor.alpha() > 190 && rightColor.alpha() > 190) {
+                leftFront.setPower(power);
+                leftRear.setPower(-power);
+                rightFront.setPower(-power);
+                rightRear.setPower(power);
+
+            } else if (leftColor.alpha() > 190 && rightColor.alpha() < 190) {
+                leftFront.setPower(power);
+                leftRear.setPower(-power - 0.1);
+                rightFront.setPower(-power + 0.1);
+                rightRear.setPower(power + 0.1);
+
+            } else if (leftColor.alpha() < 190 && rightColor.alpha() > 190) {
+                leftFront.setPower(power);
+                leftRear.setPower(-power + 0.1);
+                rightFront.setPower(-power - 0.1);
+                rightRear.setPower(power - 0.1);
+
+            } else {
+                leftFront.setPower(power);
+                leftRear.setPower(-power - 0.1);
+                rightFront.setPower(-power - 0.1);
+                rightRear.setPower(power - 0.1);
+            }
+
+
+            telemetry.addData("right Alpha", rightColor.alpha());
+            telemetry.addData("right Alpha", rightColor.alpha());
+
+            telemetry.addData("leftFront", leftFront.getCurrentPosition());
+            telemetry.addData("rightFront", rightFront.getCurrentPosition());
+            telemetry.addData("leftRear", leftRear.getCurrentPosition());
+            telemetry.addData("rightRear", rightRear.getCurrentPosition());
+            telemetry.update();
+        }
+        stop();
+    }
+
+    // Note: White = 190  Blue = 86-110
+    public void lineFollowLeft (int color, double distance, double power){
 
         encStartPosition = leftFront.getCurrentPosition();
         while (leftFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)){
-            if (leftColor.alpha() > 190 && rightColor.alpha() > 190){
+            if (leftColor.alpha() > color && rightColor.alpha() > color){
                 leftFront.setPower(-power);
                 leftRear.setPower(power);
                 rightFront.setPower(power);
                 rightRear.setPower(-power);
 
-            } else if (leftColor.alpha() > 190 && rightColor.alpha() < 190){
+            } else if (leftColor.alpha() > color && rightColor.alpha() < color){
                 leftFront.setPower(-power);
                 leftRear.setPower(power -0.1);
                 rightFront.setPower(power + 0.1);
                 rightRear.setPower(-power + 0.1);
 
-            } else if (leftColor.alpha() < 190 && rightColor.alpha() > 190){
+            } else if (leftColor.alpha() < color && rightColor.alpha() > color){
                 leftFront.setPower(-power);
                 leftRear.setPower(power + 0.1);
                 rightFront.setPower(power - 0.1);
@@ -386,6 +429,49 @@ public class Thunderbot
         }
         stop();
     }
+
+
+    // Note: White = 190  Blue = 86-110
+    public void gyroDriveToLine (int color, double power){
+
+        // Creation of speed doubles
+        double leftFrontSpeed;
+        double rightFrontSpeed;
+        double leftRearSpeed;
+        double rightRearSpeed;
+
+        // Gets starting angle and position of encoders
+        gyStartAngle = updateHeading();
+
+        while (rightColor.alpha() < color && leftColor.alpha() < color){
+            double currentAngle = updateHeading();
+            telemetry.addData("current heading", currentAngle);
+
+            // calculates required speed to adjust to gyStartAngle
+            leftFrontSpeed = power + (currentAngle - gyStartAngle) / 100;
+            rightFrontSpeed = power - (currentAngle - gyStartAngle) / 100;
+            leftRearSpeed = power + (currentAngle - gyStartAngle) / 100;
+            rightRearSpeed = power - (currentAngle - gyStartAngle) / 100;
+
+            // Setting range of adjustments (I may be wrong about this)
+            leftFrontSpeed = Range.clip(leftFrontSpeed, -1, 1);
+            rightFrontSpeed = Range.clip(rightFrontSpeed, -1, 1);
+            leftRearSpeed = Range.clip(leftRearSpeed, -1, 1);
+            rightRearSpeed = Range.clip(rightRearSpeed, -1, 1);
+
+            // Set new targets
+            leftFront.setPower(leftFrontSpeed);
+            leftRear.setPower(leftRearSpeed);
+            rightFront.setPower(rightFrontSpeed);
+            rightRear.setPower(rightRearSpeed);
+
+            telemetry.addData("current angle", updateHeading());
+
+            telemetry.update();
+        }
+        stop();
+    }
+
 
     /** Movement methods */
 
