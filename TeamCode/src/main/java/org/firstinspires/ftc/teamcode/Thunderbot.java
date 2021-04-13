@@ -347,11 +347,8 @@ public class Thunderbot
 
     public void lineFollowLeft (double distance, double power){
 
+        encStartPosition = leftFront.getCurrentPosition();
         while (leftFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)){
-            double black = 0; // Change when you know the value for black and white
-            int white = 0;
-
-
             if (leftColor.alpha() > 190 && rightColor.alpha() > 190){
                 leftFront.setPower(-power);
                 leftRear.setPower(power);
@@ -360,18 +357,18 @@ public class Thunderbot
 
             } else if (leftColor.alpha() > 190 && rightColor.alpha() < 190){
                 leftFront.setPower(-power);
-                leftRear.setPower(power);
+                leftRear.setPower(power -0.1);
                 rightFront.setPower(power + 0.1);
                 rightRear.setPower(-power + 0.1);
 
             } else if (leftColor.alpha() < 190 && rightColor.alpha() > 190){
-                leftFront.setPower(-power + 0.1);
+                leftFront.setPower(-power);
                 leftRear.setPower(power + 0.1);
-                rightFront.setPower(power);
-                rightRear.setPower(-power);
+                rightFront.setPower(power - 0.1);
+                rightRear.setPower(-power - 0.1);
 
             } else {
-                leftFront.setPower(-power - 0.1);
+                leftFront.setPower(-power);
                 leftRear.setPower(power - 0.1);
                 rightFront.setPower(power - 0.1);
                 rightRear.setPower(-power -0.1);
