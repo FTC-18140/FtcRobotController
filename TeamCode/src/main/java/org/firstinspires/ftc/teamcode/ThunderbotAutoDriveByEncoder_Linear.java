@@ -71,7 +71,7 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
                                     // Note: this time will be able to be reduced if needed
             robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
             robot.shooterServo2.setPower(-1.0);
-            robot.rampIntakeServo.setPower(0.5);
+            robot.rampIntakeServo.setPower(-0.5);
             sleep(1000); // Wait 3 secs to allow all the rings to fire
             robot.shooterServo1.setPower(0);
             robot.shooterServo2.setPower(0);
