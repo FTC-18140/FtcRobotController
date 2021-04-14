@@ -303,70 +303,35 @@ public class Thunderbot
                 rightClaw.setPosition(1);
         }
     }
-
-
-    // Follows a line using the color sensors
-    public void lineFollowRight (double distance, double power){
-
-        while (leftFront.getCurrentPosition() < (distance * COUNTS_PER_INCH + encStartPosition)){
-            double black = 0; // Change when you know the value for black and white
-            double white = 0;
-
-            if (leftColor = white && rightColor = white){
-                leftFront.setPower(power);
-                leftRear.setPower(-power);
-                rightFront.setPower(-power);
-                rightRear.setPower(power);
-
-            } else if (leftColor = white && rightColor = black){
-                leftFront.setPower(power);
-                leftRear.setPower(-power);
-                rightFront.setPower(-power + 0.1);
-                rightRear.setPower(power + 0.1);
-
-            } else if (leftColor = black && rightColor = white){
-                leftFront.setPower(power + 0.1);
-                leftRear.setPower(-power + 0.1);
-                rightFront.setPower(-power);
-                rightRear.setPower(power);
-
-            } else {
-                break; // Change when observe when both sensors see black
-            }
-
-
-            telemetry.addData("leftFront", leftFront.getCurrentPosition());
-            telemetry.addData("rightFront", rightFront.getCurrentPosition());
-            telemetry.addData("leftRear", leftRear.getCurrentPosition());
-            telemetry.addData("rightRear", rightRear.getCurrentPosition());
-            telemetry.update();
-        }
-        stop();
-    }
 */
 
-    public void lineFollowRight (double distance, double power) {
+    // Note: White alpha = 190  Blue alpha = 86-110  Grey alpha = 65-85
+    public void lineFollowRight (int color, double distance, double power) {
 
         encStartPosition = leftFront.getCurrentPosition();
         while (leftFront.getCurrentPosition() < (distance * COUNTS_PER_INCH + encStartPosition)) {
-            if (leftColor.alpha() > 190 && rightColor.alpha() > 190) {
+            // Strafe until wheels are off line
+            if (leftColor.alpha() > color && rightColor.alpha() > color) {
                 leftFront.setPower(power);
                 leftRear.setPower(-power);
                 rightFront.setPower(-power);
                 rightRear.setPower(power);
 
-            } else if (leftColor.alpha() > 190 && rightColor.alpha() < 190) {
+                // When left color sensor is on the line and the right is off put power in the right wheels
+            } else if (leftColor.alpha() > color && rightColor.alpha() < color) {
                 leftFront.setPower(power);
                 leftRear.setPower(-power - 0.1);
                 rightFront.setPower(-power + 0.1);
                 rightRear.setPower(power + 0.1);
 
-            } else if (leftColor.alpha() < 190 && rightColor.alpha() > 190) {
+                // When right color sensor is on the line and the left is off put power in the left wheels
+            } else if (leftColor.alpha() < color && rightColor.alpha() > color) {
                 leftFront.setPower(power);
                 leftRear.setPower(-power + 0.1);
                 rightFront.setPower(-power - 0.1);
                 rightRear.setPower(power - 0.1);
 
+                // when both color sensors are off the line move backwards
             } else {
                 leftFront.setPower(power);
                 leftRear.setPower(-power - 0.1);
@@ -376,7 +341,7 @@ public class Thunderbot
 
 
             telemetry.addData("right Alpha", rightColor.alpha());
-            telemetry.addData("right Alpha", rightColor.alpha());
+            telemetry.addData("left Alpha", leftColor.alpha());
 
             telemetry.addData("leftFront", leftFront.getCurrentPosition());
             telemetry.addData("rightFront", rightFront.getCurrentPosition());
@@ -387,7 +352,7 @@ public class Thunderbot
         stop();
     }
 
-    // Note: White = 190  Blue = 86-110
+
     public void lineFollowLeft (int color, double distance, double power){
 
         encStartPosition = leftFront.getCurrentPosition();
@@ -419,7 +384,7 @@ public class Thunderbot
 
 
             telemetry.addData("right Alpha", rightColor.alpha());
-            telemetry.addData("right Alpha", rightColor.alpha());
+            telemetry.addData("left Alpha", leftColor.alpha());
 
             telemetry.addData("leftFront", leftFront.getCurrentPosition());
             telemetry.addData("rightFront", rightFront.getCurrentPosition());
@@ -431,7 +396,6 @@ public class Thunderbot
     }
 
 
-    // Note: White = 190  Blue = 86-110
     public void gyroDriveToLine (int color, double power){
 
         // Creation of speed doubles
@@ -464,6 +428,9 @@ public class Thunderbot
             leftRear.setPower(leftRearSpeed);
             rightFront.setPower(rightFrontSpeed);
             rightRear.setPower(rightRearSpeed);
+
+            telemetry.addData("right Alpha", rightColor.alpha());
+            telemetry.addData("left Alpha", leftColor.alpha());
 
             telemetry.addData("current angle", updateHeading());
 
@@ -658,7 +625,6 @@ public class Thunderbot
                     leftClaw.setPosition(0.5);
                     rightClaw.setPosition(0.5);
                     state++;
-
         }
     }
 
