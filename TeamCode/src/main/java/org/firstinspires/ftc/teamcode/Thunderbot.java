@@ -93,7 +93,7 @@ public class Thunderbot
     TouchSensor touchSensor2 = null;
     ColorSensor leftColor = null;
     ColorSensor rightColor = null;
-
+    DistanceSensor distanceSensor = null;
     // For state machines
     enum autoStates {
         Right,
@@ -213,6 +213,7 @@ public class Thunderbot
         touchSensor2 = hwMap.touchSensor.get("touchSensor2");
         leftColor = hwMap.colorSensor.get("rightColor"); // Note: swapping left and right makes it easier on autonomous
         rightColor = hwMap.colorSensor.get("leftColor");
+        distanceSensor = hwMap.get(DistanceSensor.class, "distanceSensor");
 
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
@@ -247,7 +248,7 @@ public class Thunderbot
 
         }
     }
-
+*/
 
     // Moves towards target until within a certain distance. Stays on track using the distance sensor
     // Note: possibly replaces findObject
@@ -303,8 +304,9 @@ public class Thunderbot
                 rightClaw.setPosition(1);
         }
     }
-*/
 
+
+   //
     // Note: White alpha = 190  Blue alpha = 86-110  Grey alpha = 65-85
     public void lineFollowRight (int color, double distance, double power) {
 
@@ -326,7 +328,7 @@ public class Thunderbot
 
                 // When right color sensor is on the line and the left is off put power in the left wheels
             } else if (leftColor.alpha() < color && rightColor.alpha() > color) {
-                leftFront.setPower(power);
+                leftFront.setPower(power + 0.1);
                 leftRear.setPower(-power + 0.1);
                 rightFront.setPower(-power - 0.1);
                 rightRear.setPower(power - 0.1);
