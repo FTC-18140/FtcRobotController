@@ -219,8 +219,8 @@ public class Thunderbot
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
         // holds wobble goal
-        //leftClaw.setPosition(0);
-        //rightClaw.setPosition(1);
+        leftClaw.setPosition(0);
+        rightClaw.setPosition(1);
     }
 
 
