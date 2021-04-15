@@ -33,10 +33,13 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
@@ -88,7 +91,9 @@ public class Thunderbot
 
     TouchSensor touchSensor1 = null;
     TouchSensor touchSensor2 = null;
-
+    ColorSensor leftColor = null;
+    ColorSensor rightColor = null;
+    DistanceSensor distanceSensor = null;
 
 
     // converts inches to motor ticks
@@ -196,6 +201,9 @@ public class Thunderbot
         //  Define & Initialize Sensors
         touchSensor1 = hwMap.touchSensor.get("touchSensor1");
         touchSensor2 = hwMap.touchSensor.get("touchSensor2");
+        leftColor = hwMap.colorSensor.get("rightColor"); // Note: swapping left and right makes it easier on autonomous
+        rightColor = hwMap.colorSensor.get("leftColor");
+        distanceSensor = hwMap.get(DistanceSensor.class, "distanceSensor");
 
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
@@ -204,6 +212,8 @@ public class Thunderbot
         rightClaw.setPosition(1);
     }
 
+
+    /** Color/Distance Methods*/
     public void lineFollowLeft (int color, double distance, double power){
 
         encStartPosition = leftFront.getCurrentPosition();
@@ -289,6 +299,52 @@ public class Thunderbot
         }
         stop();
     }
+
+
+    public void travelToObject (double minDistance, double maxDistance, double power) throws InterruptedException {
+        double wobbleAngle = 0.0;
+        double currentAngle = updateHeading();
+        while (true) {
+            if (distanceSensor.getDistance(DistanceUnit.INCH) > minDistance && distanceSensor.getDistance(DistanceUnit.INCH) < maxDistance) { // Forward
+                leftFront.setPower(power);
+                rightFront.setPower(power);
+                leftRear.setPower(power);
+                rightRear.setPower(power);
+                telemetry.addData("distance",distanceSensor.getDistance(DistanceUnit.INCH));
+                telemetry.update();
+                wobbleAngle = updateHeading();
+
+            } else if (distanceSensor.getDistance(DistanceUnit.INCH) > maxDistance) { // Left
+                leftFront.setPower(power);
+                rightFront.setPower(-power);
+                leftRear.setPower(power);
+                rightRear.setPower(-power);
+                telemetry.addData("Current angle",  currentAngle);
+                telemetry.update();
+
+            } else if (wobbleAngle > currentAngle) { // Right // change to < if it isn't working
+                leftFront.setPower(-power);
+                rightFront.setPower(power);
+                leftRear.setPower(-power);
+                rightRear.setPower(power);
+                telemetry.addData("Current angle",  currentAngle);
+                telemetry.update();
+
+            }else if (distanceSensor.getDistance(DistanceUnit.INCH) < minDistance) { // Grab
+                stop();
+                leftClaw.setPosition(0);
+                rightClaw.setPosition(1);
+                sleep(1000);
+                break;
+
+            } else {
+                break;
+
+            }
+            currentAngle = updateHeading();
+        }
+    }
+
 
     /** Gyro methods */
 
