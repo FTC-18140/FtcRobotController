@@ -61,7 +61,9 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
         while (opModeIsActive()) {
 
             //robot.lineFollowLeft(190, 50, -0.2);
-            robot.travelToObject(Thunderbot.autoStates.KeepGoing, 10, 25, 0.1);
+
+            robot.travelToObject(6, 60, 0.1);
+            sleep(3000);
             //robot.lineFollowRight(190, 70, 0.2);
 
             /*robot.shooterMotor.setPower(0.64); // Start up shooterMotors

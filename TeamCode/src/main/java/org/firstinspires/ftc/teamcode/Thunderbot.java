@@ -96,10 +96,11 @@ public class Thunderbot
     DistanceSensor distanceSensor = null;
     // For state machines
     enum autoStates {
+        Check,
+        Forward,
         Right,
         Left,
-        KeepGoing,
-        Grab
+        Grab,
     }
 
     enum autoIfStateFails {
@@ -218,8 +219,8 @@ public class Thunderbot
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
         // holds wobble goal
-        leftClaw.setPosition(0);
-        rightClaw.setPosition(1);
+        //leftClaw.setPosition(0);
+        //rightClaw.setPosition(1);
     }
 
 
@@ -249,45 +250,94 @@ public class Thunderbot
         }
     }
 */
+    public void travelToObject (double minDistance, double maxDistance, double power) throws InterruptedException {
+        double wobbleAngle = 0.0;
+        double currentAngle = updateHeading();
+        while (true) {
+            if (distanceSensor.getDistance(DistanceUnit.INCH) > minDistance && distanceSensor.getDistance(DistanceUnit.INCH) < maxDistance) { // Forward
+                leftFront.setPower(power);
+                rightFront.setPower(power);
+                leftRear.setPower(power);
+                rightRear.setPower(power);
+                telemetry.addData("distance",distanceSensor.getDistance(DistanceUnit.INCH));
+                telemetry.update();
+                wobbleAngle = updateHeading();
 
+            } else if (distanceSensor.getDistance(DistanceUnit.INCH) > maxDistance) { // Left
+                leftFront.setPower(power);
+                rightFront.setPower(-power);
+                leftRear.setPower(power);
+                rightRear.setPower(-power);
+                telemetry.addData("Current angle",  currentAngle);
+                telemetry.update();
+
+            } else if (wobbleAngle > currentAngle) { // Right // change to < if it isn't working
+                leftFront.setPower(-power);
+                rightFront.setPower(power);
+                leftRear.setPower(-power);
+                rightRear.setPower(power);
+                telemetry.addData("Current angle",  currentAngle);
+                telemetry.update();
+
+            }else if (distanceSensor.getDistance(DistanceUnit.INCH) < minDistance) { // Grab
+                stop();
+                leftClaw.setPosition(0);
+                rightClaw.setPosition(1);
+                sleep(1000);
+                break;
+
+            } else {
+                break;
+
+            }
+            currentAngle = updateHeading();
+        }
+    }
     // Moves towards target until within a certain distance. Stays on track using the distance sensor
     // Note: possibly replaces findObject
-    public void travelToObject (autoStates command, double minDistance, double maxDistance, double power) throws InterruptedException {
+    /*public void travelToObject2 (autoStates command, double minDistance, double maxDistance, double power) throws InterruptedException {
 
         switch (command) {
 
-            case KeepGoing:
-                while (distanceSensor.getDistance(DistanceUnit.INCH) < maxDistance){ // this needs changing
+            case Check:
+                while (true){
+                if (distanceSensor.getDistance(DistanceUnit.INCH) > minDistance && distanceSensor.getDistance(DistanceUnit.INCH) < maxDistance) {
+                    command = autoStates.Forward;
 
-                    if (distanceSensor.getDistance(DistanceUnit.INCH) < minDistance){
-                        while (distanceSensor.getDistance(DistanceUnit.INCH) < minDistance) {
+                } else if (distanceSensor.getDistance(DistanceUnit.INCH) > maxDistance) {
+                    command = autoStates.Left;
+
+                } else if (distanceSensor.getDistance(DistanceUnit.INCH) < minDistance) {
+                    command = autoStates.Grab;
+                } else {
+                    command = autoStates.Right;
+                }
+            }
+
+            case Forward:
+                while (distanceSensor.getDistance(DistanceUnit.INCH) > minDistance && distanceSensor.getDistance(DistanceUnit.INCH) < maxDistance){ // this needs changing
                             leftFront.setPower(power);
                             rightFront.setPower(power);
                             leftRear.setPower(power);
                             rightRear.setPower(power);
-                        }
-                    } else {
-                       command = autoStates.Grab;
-                    }
+                            telemetry.addData("distance",distanceSensor.getDistance(DistanceUnit.INCH));
+                            telemetry.update();
+
+                            command = autoStates.Check;
                 }
-                command = autoStates.Left;
 
             case Left:
-                gyStartAngle = updateHeading();
-                double startAngle = gyStartAngle;
+                //gyStartAngle = updateHeading();
+                //double startAngle = gyStartAngle;
+                while (distanceSensor.getDistance(DistanceUnit.INCH) > maxDistance){
+                    leftFront.setPower(power);
+                    rightFront.setPower(-power);
+                    leftRear.setPower(power);
+                    rightRear.setPower(-power);
 
-                while (distanceSensor.getDistance(DistanceUnit.INCH) > maxDistance){ // Change the number if needed
-
-                    if (Math.abs(gyStartAngle-startAngle) < 90){
-                        command = autoStates.Right;
-                    }
-                        leftFront.setPower(-power);
-                        rightFront.setPower(power);
-                        leftRear.setPower(-power);
-                        rightRear.setPower(power);
-                        gyStartAngle = updateHeading();
+                    command = autoStates.Check;
                 }
-                command = autoStates.KeepGoing;
+
 
             case Right:
                 while (distanceSensor.getDistance(DistanceUnit.INCH) > maxDistance){ // Change the number if needed
@@ -295,15 +345,19 @@ public class Thunderbot
                     rightFront.setPower(power);
                     leftRear.setPower(-power);
                     rightRear.setPower(power);
+
+                    command = autoStates.Check;
                 }
-                command = autoStates.KeepGoing;
 
             case Grab:
-                stop();
-                leftClaw.setPosition(0);
-                rightClaw.setPosition(1);
+                while (distanceSensor.getDistance(DistanceUnit.INCH) < minDistance) {
+                    stop();
+                    leftClaw.setPosition(0);
+                    rightClaw.setPosition(1);
+                    sleep(250);
+                }
         }
-    }
+    }*/
 
 
    //
