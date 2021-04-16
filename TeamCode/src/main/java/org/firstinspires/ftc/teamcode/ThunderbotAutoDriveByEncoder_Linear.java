@@ -65,23 +65,23 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
             robot.gyroDriveForward(58, 0.6); // Go forward 70 inches to line up on the shooting line (could change)
             robot.gyroDriveToLine (120, 0.2 );
 
-            robot.lineFollowLeft(190, 11, 0.4); // Strafe left 10 inches in order to line up the robot to fire the rings
+            robot.lineFollowLeft(190, 14, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings     // CHANGED FROM O.4
 
             sleep(2000); // Wait 2 secs to allow the rings to reach full power
             robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
             robot.shooterServo2.setPower(-1.0);
-            sleep(1000); // Wait 3 secs to allow all the rings to fire
+            robot.rampIntakeServo.setPower(-0.5);
+            sleep(1000); // Wait 3 secs to allow all the rings to fire      //CHANGED FROM 2 OR 3 SECS
             robot.shooterServo1.setPower(0);
             robot.shooterServo2.setPower(0);
 
 
-            robot.lineFollowLeft(190, 7, 0.4); // Strafe left 10 inches in order to line up the robot to fire the rings
+            robot.lineFollowLeft(190, 4, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings     //CHANGED from 0.4
 
-            sleep(2000); // Wait 4 secs to allow the rings to reach full power
             // Note: this time will be able to be reduced if needed
             robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
             robot.shooterServo2.setPower(-1.0);
-            sleep(2000); // Wait 3 secs to allow all the rings to fire
+            sleep(2000); // Wait 3 secs to allow all the rings to fire     //CHANGED FROM 2SECS
 
             robot.strafeRight(37, 0.4);
 
@@ -89,7 +89,7 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
             robot.shooterMotor2.setPower(0);
             robot.shooterServo1.setPower(0);
             robot.shooterServo2.setPower(0);
-
+            robot.rampIntakeServo.setPower(0);
 
             robot.gyroDriveForward(20, 0.5); // Go forward 15 inches into the square B
 
@@ -99,15 +99,8 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
             robot.gyroDriveBackward(40, 0.4); // Drive backwards 28 inches to get closer to the set wobble goal
 
-            //robot.gyroTurn(160, 0.2); // to 160 degrees in order to line up the wobbleArm with the wobble goal
-                                                          // Note: If the robot is set off course this turn may cause the robot to spin
-
-            /*robot.gyroDriveForward(16, 0.2); // Move forward 16 inches to grab the wobble
-
-            robot.leftClaw.setPosition(0); // Grab the wobble and hold until program ends
-            robot.rightClaw.setPosition(1);*/
-            sleep(250);
-            robot.travelToObject(6, 45, 0.1);
+            sleep(500);     //CHANGED FROM 1 OR 0.5 SECS
+            robot.travelToObject(6, 45, 0.2);
             sleep(500); // Wait 1 secs to give enough time to grab the wobble
 
             robot.gyroTurn(24, 0.1); // turn 24 degrees left aiming for the shooter line and square A
