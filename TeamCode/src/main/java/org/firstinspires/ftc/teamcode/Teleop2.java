@@ -322,6 +322,14 @@ public class  Teleop2 extends OpMode
 
         }
 
+        if (gamepad2.right_stick_button) {
+            shooterMotor.setPower(0.6);
+            shooterMotor2.setPower(0.8);
+        } else {
+            shooterMotor.setPower(0);
+            shooterMotor2.setPower(0);
+        }
+
 
         //arm claw controls
 
