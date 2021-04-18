@@ -100,9 +100,9 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
             robot.gyroTurn(80, 0.7);
 
-            sleep(500);     //CHANGED FROM 1 OR 0.5 SECS
-            robot.travelToObject(4, 45, 0.1);
-            sleep(500); // Wait 1 secs to give enough time to grab the wobble
+            //sleep(500);     //CHANGED FROM 1 OR 0.5 SECS
+            robot.travelToObject(4, 50, 0.1);
+            sleep(600); // Wait 1 secs to give enough time to grab the wobble
 
             robot.gyroTurn(24, 0.1); // turn 24 degrees left aiming for the shooter line and square A
 
