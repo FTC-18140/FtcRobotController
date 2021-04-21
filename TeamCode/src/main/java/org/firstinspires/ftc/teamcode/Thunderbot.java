@@ -305,7 +305,8 @@ public class Thunderbot
         double wobbleAngle = 0.0;
         double currentAngle = updateHeading();
         while (true) {
-            if (distanceSensor.getDistance(DistanceUnit.INCH) > minDistance && distanceSensor.getDistance(DistanceUnit.INCH) < maxDistance) { // Forward
+            // Drive forward if the distance sensor sees an object
+            if (distanceSensor.getDistance(DistanceUnit.INCH) > minDistance && distanceSensor.getDistance(DistanceUnit.INCH) < maxDistance) {
                 leftFront.setPower(power);
                 rightFront.setPower(power);
                 leftRear.setPower(power);
@@ -314,7 +315,8 @@ public class Thunderbot
                 telemetry.update();
                 wobbleAngle = updateHeading();
 
-            } else if (distanceSensor.getDistance(DistanceUnit.INCH) > maxDistance) { // Left
+                // Turn left looking for object
+            } else if (distanceSensor.getDistance(DistanceUnit.INCH) > maxDistance) {
                 leftFront.setPower(power);
                 rightFront.setPower(-power);
                 leftRear.setPower(power);
@@ -322,7 +324,8 @@ public class Thunderbot
                 telemetry.addData("Current angle",  currentAngle);
                 telemetry.update();
 
-            } else if (wobbleAngle > currentAngle) { // Right // change to < if it isn't working
+                // Turn right looking for object
+            } else if (wobbleAngle > currentAngle) {
                 leftFront.setPower(-power);
                 rightFront.setPower(power);
                 leftRear.setPower(-power);
@@ -330,16 +333,15 @@ public class Thunderbot
                 telemetry.addData("Current angle",  currentAngle);
                 telemetry.update();
 
-            }else if (distanceSensor.getDistance(DistanceUnit.INCH) < minDistance) { // Grab
+                // When in range grab object
+            }else if (distanceSensor.getDistance(DistanceUnit.INCH) < minDistance) {
                 stop();
                 leftClaw.setPosition(0);
                 rightClaw.setPosition(1);
                 sleep(1000);
                 break;
-
             } else {
                 break;
-
             }
             currentAngle = updateHeading();
         }
@@ -347,7 +349,6 @@ public class Thunderbot
 
 
     /** Gyro methods */
-
     // Turns for a specific amount of degrees
     // Note: Negative power = right positive power = left
     public void gyroTurn(double targetHeading, double power) {
@@ -532,12 +533,6 @@ public class Thunderbot
 
         }
     }
-
-
-
-
-
-
 
 
     /** Other methods */
