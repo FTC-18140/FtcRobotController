@@ -59,30 +59,30 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Note: use sleep when you want the robot to stop for a selected time
         while (opModeIsActive()){
-            robot.shooterMotor.setPower(0.60); // Start up shooterMotors       // CHANGED FROM 0.64
+            robot.shooterMotor.setPower(0.60); // Start up shooterMotors
             robot.shooterMotor2.setPower(0.60);
 
             robot.gyroDriveForward(58, 0.6); // Go forward 70 inches to line up on the shooting line (could change)
             robot.gyroDriveToLine (120, 0.2 );
 
-            robot.lineFollowLeft(190, 14, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings     // CHANGED FROM O.4
+            robot.lineFollowLeft(190, 14, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
 
             sleep(2000); // Wait 2 secs to allow the rings to reach full power
             robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
             robot.shooterServo2.setPower(-1.0);
             robot.rampIntakeServo.setPower(-0.5);
-            sleep(1000); // Wait 3 secs to allow all the rings to fire      //CHANGED FROM 2 OR 3 SECS
+            sleep(1000); // Wait 3 secs to allow all the rings to fire
             robot.shooterServo1.setPower(0);
             robot.shooterServo2.setPower(0);
 
-            robot.lineFollowLeft(190, 6, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings     //CHANGED from 0.4
+            robot.lineFollowLeft(190, 6, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
 
             // Note: this time will be able to be reduced if needed
             robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
             robot.shooterServo2.setPower(-1.0);
-            sleep(2500); // Wait 3 secs to allow all the rings to fire     //CHANGED FROM 2SECS
+            sleep(2500); // Wait 3 secs to allow all the rings to fire
 
-            robot.strafeRight(39, 0.4);
+            robot.lineFollowRight(190, 39, 0.4);
 
             robot.shooterMotor.setPower(0); // Turn off shooterMotors and shooterServos to conserve power
             robot.shooterMotor2.setPower(0);
@@ -94,21 +94,12 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
             robot.wobbleDrop(0.7); // Drop the wobble goal in the square B
 
-            robot.strafeRight(18, 0.4); // Strafe right 18 inches to avoid the placed rings
-
-            robot.gyroDriveBackward(37, 0.4); // Drive backwards 28 inches to get closer to the set wobble goal
-
-            robot.gyroTurn(80, 0.7);
-
-            sleep(500);     //CHANGED FROM 1 OR 0.5 SECS
-            robot.travelToObject(4, 45, 0.1);
-            sleep(500); // Wait 1 secs to give enough time to grab the wobble
-
-            robot.gyroTurn(24, 0.1); // turn 24 degrees left aiming for the shooter line and square A
-
-            robot.gyroDriveBackward(35, 0.3); // Drive backwards 35 inches to the shooter line and square A       // CHANGED FROM 0.5
-
-            robot.gyroTurn(80, 0.2); // Turn 80 degrees left in order to drop the wobble in the middle of square A
+            robot.gyroTurn(73, -0.2); // turn 90
+            robot.strafeRight(94, 0.7); // strafe into wall   // changed from 0.6
+            robot.gyroDriveForward(7, 0.5);
+            robot.strafeLeftToObject(3, 20, 0.1); // look for and grab wobble
+            robot.gyroDriveToLine (110, 0.2 );
+            robot.strafeLeft(70, 0.5); // get to the white line
 
             break;
         }
