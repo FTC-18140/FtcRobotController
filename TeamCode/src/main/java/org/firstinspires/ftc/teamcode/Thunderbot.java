@@ -98,9 +98,10 @@ public class Thunderbot
 
     // converts inches to motor ticks
     static final double     COUNTS_PER_MOTOR_REV    = 28; // rev robotics hd hex motors planetary 411600
-    static final double     DRIVE_GEAR_REDUCTION    = 20; // This is < 1.0 if geared UP
+    static final double     DRIVE_GEAR_REDUCTION    = 20;
     static final double     WHEEL_DIAMETER_INCHES   = 4.0; // For figuring circumference
-    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION)
+            / (WHEEL_DIAMETER_INCHES * 3.1415);
 
 
     /** local OpMode members. */
@@ -140,7 +141,7 @@ public class Thunderbot
             parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
             // Retrieve and initialize the IMU.
-            imu = ahwMap.get(BNO055IMU.class, "imu");
+            imu = ahwMap.get(BNO055IMU.class, "imu 1");
             imu.initialize(parameters);
         }
         catch (Exception p_exeception) {
@@ -212,6 +213,45 @@ public class Thunderbot
         rightClaw.setPosition(1);
     }
 
+    /** Methods in progress */
+    public void strafeLeftToObject (double minDistance, double maxDistance, double power) throws InterruptedException {
+
+        while (true) {
+            // Drive forward if the distance sensor sees an object
+            if (distanceSensor.getDistance(DistanceUnit.INCH) > minDistance && distanceSensor.getDistance(DistanceUnit.INCH) < maxDistance) {
+                leftFront.setPower(power);
+                rightFront.setPower(power);
+                leftRear.setPower(power);
+                rightRear.setPower(power);
+                telemetry.addData("distance",distanceSensor.getDistance(DistanceUnit.INCH));
+                telemetry.update();
+
+                // Strafe left looking for object
+            } else if (distanceSensor.getDistance(DistanceUnit.INCH) > maxDistance) {
+                leftFront.setPower(-power);
+                rightFront.setPower(power);
+                leftRear.setPower(power);
+                rightRear.setPower(-power);
+                telemetry.addData("distance",distanceSensor.getDistance(DistanceUnit.INCH));
+                telemetry.update();
+
+                // When in range grab object
+            }else if (distanceSensor.getDistance(DistanceUnit.INCH) < minDistance) {
+                stop();
+                leftClaw.setPosition(0);
+                rightClaw.setPosition(1);
+                sleep(1000);
+                break;
+            } else {
+                stop();
+                leftClaw.setPosition(0);
+                rightClaw.setPosition(1);
+                sleep(500);
+                break;
+            }
+        }
+    }
+
 
     /** Color/Distance Methods*/
     public void lineFollowLeft (int color, double distance, double power){
@@ -256,6 +296,48 @@ public class Thunderbot
         stop();
     }
 
+
+    public void lineFollowRight (int color, double distance, double power){
+
+        encStartPosition = rightFront.getCurrentPosition();
+        while (rightFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)){
+            if (leftColor.alpha() > color && rightColor.alpha() > color){
+                leftFront.setPower(power);
+                leftRear.setPower(-power);
+                rightFront.setPower(-power);
+                rightRear.setPower(power);
+
+            } else if (leftColor.alpha() > color && rightColor.alpha() < color){
+                leftFront.setPower(power - 0.1);
+                leftRear.setPower(-power -0.1);
+                rightFront.setPower(-power);
+                rightRear.setPower(power + 0.1);
+
+            } else if (leftColor.alpha() < color && rightColor.alpha() > color){
+                leftFront.setPower(power + 0.1);
+                leftRear.setPower(-power + 0.1);
+                rightFront.setPower(-power);
+                rightRear.setPower(power - 0.1);
+
+            } else {
+                leftFront.setPower(power + 0.1);
+                leftRear.setPower(-power + 0.1);
+                rightFront.setPower(-power);
+                rightRear.setPower(power + 0.1);
+            }
+
+
+            telemetry.addData("right Alpha", rightColor.alpha());
+            telemetry.addData("left Alpha", leftColor.alpha());
+
+            telemetry.addData("leftFront", leftFront.getCurrentPosition());
+            telemetry.addData("rightFront", rightFront.getCurrentPosition());
+            telemetry.addData("leftRear", leftRear.getCurrentPosition());
+            telemetry.addData("rightRear", rightRear.getCurrentPosition());
+            telemetry.update();
+        }
+        stop();
+    }
 
     public void gyroDriveToLine (int color, double power){
 
@@ -486,8 +568,6 @@ public class Thunderbot
         stop();
     }
 
-
-    //
     public void strafeRight (double distance, double power) {
         encStartPosition = leftFront.getCurrentPosition();
 
