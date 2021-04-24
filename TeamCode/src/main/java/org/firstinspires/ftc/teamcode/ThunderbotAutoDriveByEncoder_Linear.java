@@ -90,12 +90,17 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
             robot.shooterServo2.setPower(0);
             robot.rampIntakeServo.setPower(0);
 
-            robot.gyroDriveForward(20, 0.5); // Go forward 15 inches into the square B
 
-            robot.wobbleDrop(0.7); // Drop the wobble goal in the square B
+
+            //robot.gyroDriveForward(20, 0.5); // Go forward 15 inches into the square B
 
             robot.gyroTurn(73, -0.2); // turn 90
-            robot.strafeRight(94, 0.7); // strafe into wall   // changed from 0.6
+
+            // drive forward to square A
+            robot.wobbleDrop(0.7); // Drop the wobble goal in the square A
+            // go backward the same amount as previously going forward
+            
+            robot.strafeRight(90, 0.7); // strafe into wall  // May need to reduce the distance a bit
             robot.gyroDriveForward(7, 0.5);
             robot.strafeLeftToObject(3, 20, 0.1); // look for and grab wobble
             robot.gyroDriveToLine (110, 0.2 );
