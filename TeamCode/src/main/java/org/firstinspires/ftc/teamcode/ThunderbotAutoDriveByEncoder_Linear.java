@@ -82,7 +82,12 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
             robot.shooterServo2.setPower(-1.0);
             sleep(2500); // Wait 3 secs to allow all the rings to fire
 
-            robot.lineFollowRight(190, 39, 0.4);
+
+
+
+            // Note: the 4 rings might get in the way
+
+            robot.lineFollowRight(190, 60, 0.4);    // hit the wall
 
             robot.shooterMotor.setPower(0); // Turn off shooterMotors and shooterServos to conserve power
             robot.shooterMotor2.setPower(0);
@@ -90,16 +95,21 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
             robot.shooterServo2.setPower(0);
             robot.rampIntakeServo.setPower(0);
 
-            robot.gyroDriveForward(20, 0.5); // Go forward 15 inches into the square B
-
+            robot.gyroDriveForward(70, 0.5); // Go forward high power to square C
+            // maybe look for blue line on square C
+            // maybe turn to place more out of the way
             robot.wobbleDrop(0.7); // Drop the wobble goal in the square B
+            //go backwards fast
+            // then look for white line either using gyroDriveToLine or a new method going backwards
+            // lineFollowLeft
 
             robot.gyroTurn(73, -0.2); // turn 90
-            robot.strafeRight(94, 0.7); // strafe into wall   // changed from 0.6
+            robot.strafeRight(90, 0.7); // strafe into wall   // Maybe lower the distance more
             robot.gyroDriveForward(7, 0.5);
             robot.strafeLeftToObject(3, 20, 0.1); // look for and grab wobble
             robot.gyroDriveToLine (110, 0.2 );
-            robot.strafeLeft(70, 0.5); // get to the white line
+
+            robot.strafeLeft(70, 0.5);          // get to Square C quickly
 
             break;
         }
