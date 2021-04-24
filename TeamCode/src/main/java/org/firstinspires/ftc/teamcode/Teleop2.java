@@ -235,18 +235,7 @@ public class  Teleop2 extends OpMode
 
 //ramp servo
 
-        if (gamepad1.b) {
-            armMotor.setPower(0);
-        }
 
-        //Shooter servo kill switch
-        if (gamepad1.dpad_up) {
-            shooterServo1.setPower(0);
-            shooterServo2.setPower(0);
-        }else {
-            shooterServo2.setPower(-1);
-            shooterServo1.setPower(-1);
-        }
 
 
 // gamepad2 controls
@@ -320,6 +309,14 @@ public class  Teleop2 extends OpMode
             shooterMotor2.setPower(0);
             shooterMotor.setPower(0);
 
+        }
+
+        if (gamepad2.dpad_left) {
+            shooterMotor.setPower(0.6);
+            shooterMotor2.setPower(0.8);
+        } else {
+            shooterMotor.setPower(0);
+            shooterMotor2.setPower(0);
         }
 
         if (gamepad2.right_stick_button) {
