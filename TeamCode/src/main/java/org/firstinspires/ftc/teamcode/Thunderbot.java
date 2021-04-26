@@ -30,6 +30,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -94,6 +96,7 @@ public class Thunderbot
     ColorSensor leftColor = null;
     ColorSensor rightColor = null;
     DistanceSensor distanceSensor = null;
+    WebcamName cam = null;
 
 
     // converts inches to motor ticks
@@ -205,6 +208,7 @@ public class Thunderbot
         leftColor = hwMap.colorSensor.get("rightColor"); // Note: swapping left and right makes it easier on autonomous
         rightColor = hwMap.colorSensor.get("leftColor");
         distanceSensor = hwMap.get(DistanceSensor.class, "distanceSensor");
+        cam = hwMap.get(WebcamName.class, "cam");
 
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
