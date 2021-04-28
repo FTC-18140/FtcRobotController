@@ -56,8 +56,8 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         // Initialize the drive system variables.
-        robot.initVuforia();
-        robot.initTfod();
+        robot.initVuforia(hardwareMap);
+        robot.initTfod(hardwareMap);
         robot.init(hardwareMap, telemetry);
 
         if (robot.tfod != null) {
