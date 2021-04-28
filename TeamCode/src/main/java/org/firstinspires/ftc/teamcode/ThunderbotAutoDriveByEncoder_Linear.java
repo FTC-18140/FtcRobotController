@@ -32,6 +32,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.sleep;
@@ -52,13 +56,31 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         // Initialize the drive system variables.
+        robot.initVuforia();
+        robot.initTfod();
         robot.init(hardwareMap, telemetry);
+
+        if (robot.tfod != null) {
+            robot.tfod.activate();
+            // The TensorFlow software will scale the input images from the camera to a lower resolution.
+            // This can result in lower detection accuracy at longer distances (> 55cm or 22").
+            // If your target is at distance greater than 50 cm (20") you can adjust the magnification value
+            // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
+            // should be set to the value of the images used to create the TensorFlow Object Detection model
+            // (typically 16/9).
+            robot.tfod.setZoom(1.0, 16.0/9.0);
+        }
+
+        robot.checkRings();
 
         // Wait for the game to start (driver presses PLAY)ds
         waitForStart();
 
         // Note: use sleep when you want the robot to stop for a selected time
         while (opModeIsActive()){
+            if (robot.tfod != null) {
+                robot.tfod.shutdown();
+            }
             robot.shooterMotor.setPower(0.60); // Start up shooterMotors
             robot.shooterMotor2.setPower(0.60);
 

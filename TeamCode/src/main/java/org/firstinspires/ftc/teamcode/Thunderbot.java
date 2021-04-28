@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -53,10 +54,16 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
+import java.util.List;
 
 import static java.lang.Thread.sleep;
 
@@ -96,7 +103,6 @@ public class Thunderbot
     ColorSensor leftColor = null;
     ColorSensor rightColor = null;
     DistanceSensor distanceSensor = null;
-    WebcamName cam = null;
 
 
     // converts inches to motor ticks
@@ -118,6 +124,14 @@ public class Thunderbot
 
     static double gyStartAngle = 0; // a shared gyro start position this will be updated using updateHeading()
 
+    /**Computor vision*/
+    private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
+    private static final String LABEL_FIRST_ELEMENT = "Quad";
+    private static final String LABEL_SECOND_ELEMENT = "Single";
+    private static final String VUFORIA_KEY =
+            "AdAW/iz/////AAABmYgL/USiRk6wrOU3PCgllcxrhasjPkR3tL10jedJq6lpPU579fPiO66TP5B2TqVBBQUzjhrWC19IXDOsKhj045Ri82dk7C2f9cnpR6rcdmxJqc0rOVFk7e4/hAo8Pfmisj6In2mN7ibcBAE3MkE6VzGF0Op8cukn4US3+jpnd9WnHjAwJTo+jM9PNkYhIwJrwLfnKIOYbT71xQptdT0FBFVBvcW8Ru3baL7xTD71qL9aJqP3M2VH7JrRrVroJUUZrfL3CB+l6eTiVfO3JLDDHR/7DHeuDtzpbqZBFrXce2X2zAl4I1sD1A/sX3j7k6nuIcStJ2AqXTDi93/H2YuM4PZN0NyMGb8ffUkkXDV6/d2L";
+    private VuforiaLocalizer vuforia;
+    public TFObjectDetector tfod;
 
     /** Constructor */
     public Thunderbot(){
@@ -208,13 +222,69 @@ public class Thunderbot
         leftColor = hwMap.colorSensor.get("rightColor"); // Note: swapping left and right makes it easier on autonomous
         rightColor = hwMap.colorSensor.get("leftColor");
         distanceSensor = hwMap.get(DistanceSensor.class, "distanceSensor");
-        cam = hwMap.get(WebcamName.class, "cam");
 
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
         // holds wobble goal
         leftClaw.setPosition(0);
         rightClaw.setPosition(1);
+    }
+    /**Computer vision methods*/
+    public void initVuforia() {
+         //Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraName = hwMap.get(WebcamName.class, "Webcam 1");
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
+    }
+
+    public void checkRings(){
+        if (tfod != null) {
+            // getUpdatedRecognitions() will return null if no new information is available since
+            // the last time that call was made.
+            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+            if (updatedRecognitions != null) {
+                telemetry.addData("# Object Detected", updatedRecognitions.size());
+                if (updatedRecognitions.size() == 0) {
+                    // empty list.  no objects recognized.
+                    telemetry.addData("TFOD", "No items detected.");
+                    telemetry.addData("Target Zone", "A");
+                } else {
+                    // list is not empty.
+                    // step through the list of recognitions and display boundary info.
+                    int i = 0;
+                    for (Recognition recognition : updatedRecognitions) {
+                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+                                recognition.getLeft(), recognition.getTop());
+                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+                                recognition.getRight(), recognition.getBottom());
+
+                        // check label to see which target zone to go after.
+                        if (recognition.getLabel().equals("Single")) {
+                            telemetry.addData("Target Zone", "B");
+                        } else if (recognition.getLabel().equals("Quad")) {
+                            telemetry.addData("Target Zone", "C");
+                        } else {
+                            telemetry.addData("Target Zone", "UNKNOWN");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void initTfod() {
+        int tfodMonitorViewId = hwMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hwMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minResultConfidence = 0.8f;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
 
     /** Methods in progress */
