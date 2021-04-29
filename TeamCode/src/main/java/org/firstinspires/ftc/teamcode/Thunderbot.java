@@ -873,19 +873,21 @@ public class Thunderbot
 
 
 
-        //robot.gyroDriveForward(20, 0.5); // Go forward 15 inches into the square B
-
         gyroTurn(73, -0.2); // turn 90
 
-        // drive forward to square A
+        gyroDriveForward(10,0.5);// drive forward to square A
+
         wobbleDrop(0.7); // Drop the wobble goal in the square A
-        // go backward the same amount as previously going forward
+
+        gyroDriveBackward(15, 0.5);// go backward the same amount as previously going forward
 
         strafeRight(90, 0.7); // strafe into wall  // May need to reduce the distance a bit
-        gyroDriveForward(7, 0.5);
+
         strafeLeftToObject(3, 20, 0.1); // look for and grab wobble
+
         gyroDriveToLine (110, 0.2 );
-        strafeLeft(70, 0.5); // get to the white line
+
+        strafeLeft(65, 0.5); // get to the white line
     }
 
     public void targetZoneB() throws InterruptedException {
@@ -920,19 +922,28 @@ public class Thunderbot
         shooterServo2.setPower(0);
         rampIntakeServo.setPower(0);
 
+
+
         gyroDriveForward(20, 0.5); // Go forward 15 inches into the square B
 
         wobbleDrop(0.7); // Drop the wobble goal in the square B
 
-        //Note: The ring may get in the way
-
         gyroTurn(73, -0.2); // turn 73 degrees right
+
         strafeRight(94, 0.7); // strafe into wall   // changed from 0.6
-        gyroDriveForward(7, 0.5);
+
+        gyroDriveForward(10, 0.5);
+
         strafeLeftToObject(3, 20, 0.1); // look for and grab wobble
-        gyroDriveToLine (110, 0.2 );
+
+        //gyroDriveToLine (110, 0.2 );
+        //maybe go backwards
+
         strafeLeft(70, 0.5); // get to the white line
-        gyroTurn(75, 0.2);
+
+        gyroTurn(80, 1.0);
+
+        gyroDriveForward(10,0.5);
     }
 
     public void targetZoneC() throws InterruptedException {
@@ -959,18 +970,18 @@ public class Thunderbot
         shooterServo2.setPower(-1.0);
         sleep(2500); // Wait 3 secs to allow all the rings to fire
 
-
-
-
-        // Note: the 4 rings might get in the way
-
-        lineFollowRight(190, 60, 0.4);    // hit the wall
+        lineFollowRight(190, 39, 0.4);
 
         shooterMotor.setPower(0); // Turn off shooterMotors and shooterServos to conserve power
         shooterMotor2.setPower(0);
         shooterServo1.setPower(0);
         shooterServo2.setPower(0);
         rampIntakeServo.setPower(0);
+
+
+
+
+        /*lineFollowRight(190, 21, 0.4);    // hit the wall
 
         gyroDriveForward(70, 0.5); // Go forward high power to square C
         // maybe look for blue line on square C
@@ -981,12 +992,17 @@ public class Thunderbot
         // lineFollowLeft
 
         gyroTurn(73, -0.2); // turn 90
+
         strafeRight(90, 0.7); // strafe into wall   // Maybe lower the distance more
+
         gyroDriveForward(7, 0.5);
+
         strafeLeftToObject(3, 20, 0.1); // look for and grab wobble
+
         gyroDriveToLine (110, 0.2 );
 
         strafeLeft(70, 0.5);          // get to Square C quickly
+        */
     }
 
     public void targetZoneAB() throws InterruptedException {
