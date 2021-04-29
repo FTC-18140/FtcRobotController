@@ -846,8 +846,58 @@ public class Thunderbot
 
     }
 
-    public void targetZoneC(){
+    public void targetZoneC() throws InterruptedException {
+        shooterMotor.setPower(0.60); // Start up shooterMotors
+        shooterMotor2.setPower(0.60);
 
+        gyroDriveForward(58, 0.6); // Go forward 70 inches to line up on the shooting line (could change)
+        gyroDriveToLine (120, 0.2 );
+
+        lineFollowLeft(190, 14, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
+
+        sleep(2000); // Wait 2 secs to allow the rings to reach full power
+        shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
+        shooterServo2.setPower(-1.0);
+        rampIntakeServo.setPower(-0.5);
+        sleep(1000); // Wait 3 secs to allow all the rings to fire
+        shooterServo1.setPower(0);
+        shooterServo2.setPower(0);
+
+        lineFollowLeft(190, 6, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
+
+        // Note: this time will be able to be reduced if needed
+        shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
+        shooterServo2.setPower(-1.0);
+        sleep(2500); // Wait 3 secs to allow all the rings to fire
+
+
+
+
+        // Note: the 4 rings might get in the way
+
+        lineFollowRight(190, 60, 0.4);    // hit the wall
+
+        shooterMotor.setPower(0); // Turn off shooterMotors and shooterServos to conserve power
+        shooterMotor2.setPower(0);
+        shooterServo1.setPower(0);
+        shooterServo2.setPower(0);
+        rampIntakeServo.setPower(0);
+
+        gyroDriveForward(70, 0.5); // Go forward high power to square C
+        // maybe look for blue line on square C
+        // maybe turn to place more out of the way
+        wobbleDrop(0.7); // Drop the wobble goal in the square B
+        //go backwards fast
+        // then look for white line either using gyroDriveToLine or a new method going backwards
+        // lineFollowLeft
+
+        gyroTurn(73, -0.2); // turn 90
+        strafeRight(90, 0.7); // strafe into wall   // Maybe lower the distance more
+        gyroDriveForward(7, 0.5);
+        strafeLeftToObject(3, 20, 0.1); // look for and grab wobble
+        gyroDriveToLine (110, 0.2 );
+
+        strafeLeft(70, 0.5);          // get to Square C quickly
     }
 
     public void targetZoneAB() throws InterruptedException {
