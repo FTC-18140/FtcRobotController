@@ -136,6 +136,8 @@ public class Thunderbot
     public VuforiaLocalizer vuforia;
     public TFObjectDetector tfod;
 
+    public int nOfSetRings;
+
     /** Constructor */
     public Thunderbot(){
 
@@ -248,42 +250,44 @@ public class Thunderbot
         // Loading trackables is not necessary for the TensorFlow Object Detection engine.
     }
 
-    public void checkRings(){
-        if (tfod != null) {
-            // getUpdatedRecognitions() will return null if no new information is available since
-            // the last time that call was made.
-            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+    public void checkRings() {
+        while (true) { // while(true) doesn't work try a different while loop
+            if (tfod != null) {
+                // getUpdatedRecognitions() will return null if no new information is available since
+                // the last time that call was made.
+                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
-            if (updatedRecognitions != null) {
-                telemetry.addData("# Object Detected", updatedRecognitions.size());
+                if (updatedRecognitions != null) {
+                    telemetry.addData("# Object Detected", updatedRecognitions.size());
 
-                if (updatedRecognitions.size() == 0) {
-                    // empty list.  no objects recognized.
-                    telemetry.addData("TFOD", "No items detected.");
-                    telemetry.addData("Target Zone", "A");
-                } else {
-                    // list is not empty.
-                    // step through the list of recognitions and display boundary info.
-                    int i = 0;
-                    for (Recognition recognition : updatedRecognitions) {
-                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                recognition.getLeft(), recognition.getTop());
-                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                recognition.getRight(), recognition.getBottom());
+                    if (updatedRecognitions.size() == 0) {
+                        // empty list.  no objects recognized.
+                        telemetry.addData("TFOD", "No items detected.");
+                        telemetry.addData("Target Zone", "A");
+                    } else {
+                        // list is not empty.
+                        // step through the list of recognitions and display boundary info.
+                        int i = 0;
+                        for (Recognition recognition : updatedRecognitions) {
+                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                            telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+                                    recognition.getLeft(), recognition.getTop());
+                            telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+                                    recognition.getRight(), recognition.getBottom());
 
-                        // check label to see which target zone to go after.
-                        if (recognition.getLabel().equals("Single")) {
-                            telemetry.addData("Target Zone", "B");
-                        } else if (recognition.getLabel().equals("Quad")) {
-                            telemetry.addData("Target Zone", "C");
-                        } else {
-                            telemetry.addData("Target Zone", "UNKNOWN");
+                            // check label to see which target zone to go after.
+                            if (recognition.getLabel().equals("Single")) {
+                                telemetry.addData("Target Zone", "B");
+                            } else if (recognition.getLabel().equals("Quad")) {
+                                telemetry.addData("Target Zone", "C");
+                            } else {
+                                telemetry.addData("Target Zone", "UNKNOWN");
+                            }
                         }
                     }
                 }
+                telemetry.update();
             }
-            telemetry.update();
         }
     }
 
@@ -833,4 +837,62 @@ public class Thunderbot
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
+
+    public void targetZoneA (){
+
+    }
+
+    public void targetZoneB(){
+
+    }
+
+    public void targetZoneC(){
+
+    }
+
+    public void targetZoneAB() throws InterruptedException {
+        shooterMotor.setPower(0.60); // Start up shooterMotors
+        shooterMotor2.setPower(0.60);
+
+        gyroDriveForward(58, 0.6); // Go forward 70 inches to line up on the shooting line (could change)
+        gyroDriveToLine (120, 0.2 );
+
+        lineFollowLeft(190, 14, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
+
+        sleep(2000); // Wait 2 secs to allow the rings to reach full power
+        shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
+        shooterServo2.setPower(-1.0);
+        rampIntakeServo.setPower(-0.5);
+        sleep(1000); // Wait 3 secs to allow all the rings to fire
+        shooterServo1.setPower(0);
+        shooterServo2.setPower(0);
+
+        lineFollowLeft(190, 6, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
+
+        // Note: this time will be able to be reduced if needed
+        shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
+        shooterServo2.setPower(-1.0);
+        sleep(2500); // Wait 3 secs to allow all the rings to fire
+
+        lineFollowRight(190, 39, 0.4);
+
+        shooterMotor.setPower(0); // Turn off shooterMotors and shooterServos to conserve power
+        shooterMotor2.setPower(0);
+        shooterServo1.setPower(0);
+        shooterServo2.setPower(0);
+        rampIntakeServo.setPower(0);
+
+        gyroDriveForward(20, 0.5); // Go forward 15 inches into the square B
+
+        wobbleDrop(0.7); // Drop the wobble goal in the square B
+
+        gyroTurn(73, -0.2); // turn 90
+        strafeRight(94, 0.7); // strafe into wall   // changed from 0.6
+        gyroDriveForward(7, 0.5);
+        strafeLeftToObject(3, 20, 0.1); // look for and grab wobble
+        gyroDriveToLine (110, 0.2 );
+        strafeLeft(70, 0.5); // get to the white line
+    }
 }
+
+
