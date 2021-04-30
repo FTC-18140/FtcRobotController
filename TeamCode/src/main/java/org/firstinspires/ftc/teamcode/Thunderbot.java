@@ -353,15 +353,15 @@ public class Thunderbot
 
             } else if (leftColor.alpha() > color && rightColor.alpha() < color){
                 leftFront.setPower(-power);
-                leftRear.setPower(power -0.1);
-                rightFront.setPower(power + 0.1);
-                rightRear.setPower(-power + 0.1);
+                leftRear.setPower(power -0.05);
+                rightFront.setPower(power + 0.05);
+                rightRear.setPower(-power + 0.05);
 
             } else if (leftColor.alpha() < color && rightColor.alpha() > color){
                 leftFront.setPower(-power);
-                leftRear.setPower(power + 0.1);
-                rightFront.setPower(power - 0.1);
-                rightRear.setPower(-power - 0.1);
+                leftRear.setPower(power + 0.05);
+                rightFront.setPower(power - 0.15);
+                rightRear.setPower(-power - 0.15);
 
             } else {
                 leftFront.setPower(-power);
@@ -958,5 +958,3 @@ public class Thunderbot
         strafeLeft(70, 0.5); // get to the white line
     }
 }
-
-
