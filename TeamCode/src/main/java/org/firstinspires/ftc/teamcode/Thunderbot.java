@@ -839,14 +839,14 @@ public class Thunderbot
     }
 
     /** Target zone methods */
-    public void targetZoneA () throws InterruptedException {
+    public void powerShot() throws InterruptedException {
         shooterMotor.setPower(0.60); // Start up shooterMotors
         shooterMotor2.setPower(0.60);
 
         gyroDriveForward(58, 0.6); // Go forward 70 inches to line up on the shooting line (could change)
         gyroDriveToLine (120, 0.2 );
 
-        lineFollowLeft(190, 14, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
+        lineFollowLeft(190, 20, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
 
         sleep(2000); // Wait 2 secs to allow the rings to reach full power
         shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
@@ -863,16 +863,18 @@ public class Thunderbot
         shooterServo2.setPower(-1.0);
         sleep(2500); // Wait 3 secs to allow all the rings to fire
 
-        lineFollowRight(190, 39, 0.4);
+        lineFollowRight(190, 45, 0.4);      // Changed from 39
 
         shooterMotor.setPower(0); // Turn off shooterMotors and shooterServos to conserve power
         shooterMotor2.setPower(0);
         shooterServo1.setPower(0);
         shooterServo2.setPower(0);
         rampIntakeServo.setPower(0);
+    }
 
 
 
+    public void targetZoneA () throws InterruptedException {
         gyroTurn(73, -0.2); // turn 90
 
         gyroDriveForward(10,0.5);// drive forward to square A
@@ -891,39 +893,6 @@ public class Thunderbot
     }
 
     public void targetZoneB() throws InterruptedException {
-        shooterMotor.setPower(0.60); // Start up shooterMotors
-        shooterMotor2.setPower(0.60);
-
-        gyroDriveForward(58, 0.6); // Go forward 70 inches to line up on the shooting line (could change)
-        gyroDriveToLine (120, 0.2 );
-
-        lineFollowLeft(190, 14, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
-
-        sleep(2000); // Wait 2 secs to allow the rings to reach full power
-        shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
-        shooterServo2.setPower(-1.0);
-        rampIntakeServo.setPower(-0.5);
-        sleep(1000); // Wait 3 secs to allow all the rings to fire
-        shooterServo1.setPower(0);
-        shooterServo2.setPower(0);
-
-        lineFollowLeft(190, 6, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
-
-        // Note: this time will be able to be reduced if needed
-        shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
-        shooterServo2.setPower(-1.0);
-        sleep(2500); // Wait 3 secs to allow all the rings to fire
-
-        lineFollowRight(190, 39, 0.4);
-
-        shooterMotor.setPower(0); // Turn off shooterMotors and shooterServos to conserve power
-        shooterMotor2.setPower(0);
-        shooterServo1.setPower(0);
-        shooterServo2.setPower(0);
-        rampIntakeServo.setPower(0);
-
-
-
         gyroDriveForward(20, 0.5); // Go forward 15 inches into the square B
 
         wobbleDrop(0.7); // Drop the wobble goal in the square B
@@ -947,40 +916,6 @@ public class Thunderbot
     }
 
     public void targetZoneC() throws InterruptedException {
-        shooterMotor.setPower(0.60); // Start up shooterMotors
-        shooterMotor2.setPower(0.60);
-
-        gyroDriveForward(58, 0.6); // Go forward 70 inches to line up on the shooting line (could change)
-        gyroDriveToLine (120, 0.2 );
-
-        lineFollowLeft(190, 14, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
-
-        sleep(2000); // Wait 2 secs to allow the rings to reach full power
-        shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
-        shooterServo2.setPower(-1.0);
-        rampIntakeServo.setPower(-0.5);
-        sleep(1000); // Wait 3 secs to allow all the rings to fire
-        shooterServo1.setPower(0);
-        shooterServo2.setPower(0);
-
-        lineFollowLeft(190, 6, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
-
-        // Note: this time will be able to be reduced if needed
-        shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
-        shooterServo2.setPower(-1.0);
-        sleep(2500); // Wait 3 secs to allow all the rings to fire
-
-        lineFollowRight(190, 39, 0.4);
-
-        shooterMotor.setPower(0); // Turn off shooterMotors and shooterServos to conserve power
-        shooterMotor2.setPower(0);
-        shooterServo1.setPower(0);
-        shooterServo2.setPower(0);
-        rampIntakeServo.setPower(0);
-
-
-
-
         /*lineFollowRight(190, 21, 0.4);    // hit the wall
 
         gyroDriveForward(70, 0.5); // Go forward high power to square C
@@ -1006,46 +941,20 @@ public class Thunderbot
     }
 
     public void targetZoneAB() throws InterruptedException {
-        shooterMotor.setPower(0.60); // Start up shooterMotors
-        shooterMotor2.setPower(0.60);
-
-        gyroDriveForward(58, 0.6); // Go forward 70 inches to line up on the shooting line (could change)
-        gyroDriveToLine (120, 0.2 );
-
-        lineFollowLeft(190, 14, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
-
-        sleep(2000); // Wait 2 secs to allow the rings to reach full power
-        shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
-        shooterServo2.setPower(-1.0);
-        rampIntakeServo.setPower(-0.5);
-        sleep(1000); // Wait 3 secs to allow all the rings to fire
-        shooterServo1.setPower(0);
-        shooterServo2.setPower(0);
-
-        lineFollowLeft(190, 6, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
-
-        // Note: this time will be able to be reduced if needed
-        shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
-        shooterServo2.setPower(-1.0);
-        sleep(2500); // Wait 3 secs to allow all the rings to fire
-
-        lineFollowRight(190, 39, 0.4);
-
-        shooterMotor.setPower(0); // Turn off shooterMotors and shooterServos to conserve power
-        shooterMotor2.setPower(0);
-        shooterServo1.setPower(0);
-        shooterServo2.setPower(0);
-        rampIntakeServo.setPower(0);
-
         gyroDriveForward(20, 0.5); // Go forward 15 inches into the square B
 
         wobbleDrop(0.7); // Drop the wobble goal in the square B
 
         gyroTurn(73, -0.2); // turn 90
+
         strafeRight(94, 0.7); // strafe into wall   // changed from 0.6
+
         gyroDriveForward(7, 0.5);
+
         strafeLeftToObject(3, 20, 0.1); // look for and grab wobble
+
         gyroDriveToLine (110, 0.2 );
+
         strafeLeft(70, 0.5); // get to the white line
     }
 }

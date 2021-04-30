@@ -125,15 +125,19 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
 
             if (robot.nOfSetRings == 0){
                 // square A
+                robot.powerShot();
                 robot.targetZoneA();
             } else if (robot.nOfSetRings == 1) {
                 // square B
+                robot.powerShot();
                 robot.targetZoneB();
             } else if (robot.nOfSetRings == 4){
                 // square C
+                robot.powerShot();
                 robot.targetZoneC();
             } else {
                 // normal master code or square A
+                robot.powerShot();
                 robot.targetZoneAB();
             }
 

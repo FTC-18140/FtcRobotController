@@ -263,6 +263,11 @@ public class  Teleop2 extends OpMode
 
 
 
+        if (gamepad2.dpad_right) {
+            rampIntakeServo.setPower(0);
+        }
+
+
 
 //arm kill switch
         if (gamepad2.b) {
