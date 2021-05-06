@@ -78,9 +78,10 @@ import static java.lang.Thread.sleep;
  * See PushbotTeleopTank_Iterative and others classes starting with "Pushbot" for usage examples.
  */
 
-public class Thunderbot
-{
-    /** Public OpMode members. */
+public class Thunderbot {
+    /**
+     * Public OpMode members.
+     */
     DcMotor leftFront = null;
     DcMotor rightFront = null;
     DcMotor leftRear = null;
@@ -109,25 +110,31 @@ public class Thunderbot
     //CameraName cameraName = null;
 
     // converts inches to motor ticks
-    static final double     COUNTS_PER_MOTOR_REV    = 28; // rev robotics hd hex motors planetary 411600
-    static final double     DRIVE_GEAR_REDUCTION    = 20;
-    static final double     WHEEL_DIAMETER_INCHES   = 4.0; // For figuring circumference
-    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION)
+    static final double COUNTS_PER_MOTOR_REV = 28; // rev robotics hd hex motors planetary 411600
+    static final double DRIVE_GEAR_REDUCTION = 20;
+    static final double WHEEL_DIAMETER_INCHES = 4.0; // For figuring circumference
+    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION)
             / (WHEEL_DIAMETER_INCHES * 3.1415);
 
 
-    /** local OpMode members. */
-    HardwareMap hwMap =  null;
+    /**
+     * local OpMode members.
+     */
+    HardwareMap hwMap = null;
     private Telemetry telemetry;
-    private ElapsedTime runtime  = new ElapsedTime();
+    private ElapsedTime runtime = new ElapsedTime();
 
-    /** Gyro */
+    /**
+     * Gyro
+     */
     BNO055IMU imu = null;
     Orientation angles = null;
 
     static double gyStartAngle = 0; // a shared gyro start position this will be updated using updateHeading()
 
-    /**Computor vision*/
+    /**
+     * Computor vision
+     */
     public static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
     public static final String LABEL_FIRST_ELEMENT = "Quad";
     public static final String LABEL_SECOND_ELEMENT = "Single";
@@ -138,19 +145,22 @@ public class Thunderbot
 
     public int nOfSetRings;
 
-    /** Constructor */
-    public Thunderbot(){
+    /**
+     * Constructor
+     */
+    public Thunderbot() {
 
     }
 
-    /** Initialize standard Hardware interfaces */
+    /**
+     * Initialize standard Hardware interfaces
+     */
     public void init(HardwareMap ahwMap, Telemetry telem) {
         // Save reference to Hardware map
         hwMap = ahwMap;
         telemetry = telem;
 
-        try
-        {
+        try {
             // Set up the parameters with which we will use our IMU. Note that integration
             // algorithm here just reports accelerations to the logcat log; it doesn't actually
             // provide positional information.
@@ -165,8 +175,7 @@ public class Thunderbot
             // Retrieve and initialize the IMU.
             imu = ahwMap.get(BNO055IMU.class, "imu 1");
             imu.initialize(parameters);
-        }
-        catch (Exception p_exeception) {
+        } catch (Exception p_exeception) {
             telemetry.addData("imu not found in config file", 0);
             imu = null;
         }
@@ -235,9 +244,11 @@ public class Thunderbot
         rightClaw.setPosition(1);
     }
 
-    /**Computer vision methods*/
+    /**
+     * Computer vision methods
+     */
     public void initVuforia(HardwareMap ahwMap) {
-         //Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+        //Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
@@ -300,8 +311,10 @@ public class Thunderbot
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
 
-    /** Methods in progress */
-    public void strafeLeftToObject (double minDistance, double maxDistance, double power) throws InterruptedException {
+    /**
+     * Methods in progress
+     */
+    public void strafeLeftToObject(double minDistance, double maxDistance, double power) throws InterruptedException {
 
         while (true) {
             // Drive forward if the distance sensor sees an object
@@ -310,7 +323,7 @@ public class Thunderbot
                 rightFront.setPower(power);
                 leftRear.setPower(power);
                 rightRear.setPower(power);
-                telemetry.addData("distance",distanceSensor.getDistance(DistanceUnit.INCH));
+                telemetry.addData("distance", distanceSensor.getDistance(DistanceUnit.INCH));
                 telemetry.update();
 
                 // Strafe left looking for object
@@ -319,11 +332,11 @@ public class Thunderbot
                 rightFront.setPower(power);
                 leftRear.setPower(power);
                 rightRear.setPower(-power);
-                telemetry.addData("distance",distanceSensor.getDistance(DistanceUnit.INCH));
+                telemetry.addData("distance", distanceSensor.getDistance(DistanceUnit.INCH));
                 telemetry.update();
 
                 // When in range grab object
-            }else if (distanceSensor.getDistance(DistanceUnit.INCH) < minDistance) {
+            } else if (distanceSensor.getDistance(DistanceUnit.INCH) < minDistance) {
                 stop();
                 leftClaw.setPosition(0);
                 rightClaw.setPosition(1);
@@ -340,24 +353,26 @@ public class Thunderbot
     }
 
 
-    /** Color/Distance Methods*/
-    public void lineFollowLeft (int color, double distance, double power){
+    /**
+     * Color/Distance Methods
+     */
+    public void lineFollowLeft(int color, double distance, double power) {
 
         encStartPosition = leftFront.getCurrentPosition();
-        while (leftFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)){
-            if (leftColor.alpha() > color && rightColor.alpha() > color){
+        while (leftFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)) {
+            if (leftColor.alpha() > color && rightColor.alpha() > color) {
                 leftFront.setPower(-power);
                 leftRear.setPower(power);
                 rightFront.setPower(power);
                 rightRear.setPower(-power);
 
-            } else if (leftColor.alpha() > color && rightColor.alpha() < color){
+            } else if (leftColor.alpha() > color && rightColor.alpha() < color) {
                 leftFront.setPower(-power);
-                leftRear.setPower(power -0.05);
+                leftRear.setPower(power - 0.05);
                 rightFront.setPower(power + 0.05);
                 rightRear.setPower(-power + 0.05);
 
-            } else if (leftColor.alpha() < color && rightColor.alpha() > color){
+            } else if (leftColor.alpha() < color && rightColor.alpha() > color) {
                 leftFront.setPower(-power);
                 leftRear.setPower(power + 0.05);
                 rightFront.setPower(power - 0.15);
@@ -367,7 +382,7 @@ public class Thunderbot
                 leftFront.setPower(-power);
                 leftRear.setPower(power - 0.1);
                 rightFront.setPower(power - 0.1);
-                rightRear.setPower(-power -0.1);
+                rightRear.setPower(-power - 0.1);
             }
 
 
@@ -384,23 +399,23 @@ public class Thunderbot
     }
 
 
-    public void lineFollowRight (int color, double distance, double power){
+    public void lineFollowRight(int color, double distance, double power) {
 
         encStartPosition = rightFront.getCurrentPosition();
-        while (rightFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)){
-            if (leftColor.alpha() > color && rightColor.alpha() > color){
+        while (rightFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)) {
+            if (leftColor.alpha() > color && rightColor.alpha() > color) {
                 leftFront.setPower(power);
                 leftRear.setPower(-power);
                 rightFront.setPower(-power);
                 rightRear.setPower(power);
 
-            } else if (leftColor.alpha() > color && rightColor.alpha() < color){
+            } else if (leftColor.alpha() > color && rightColor.alpha() < color) {
                 leftFront.setPower(power - 0.1);
-                leftRear.setPower(-power -0.1);
+                leftRear.setPower(-power - 0.1);
                 rightFront.setPower(-power);
                 rightRear.setPower(power + 0.1);
 
-            } else if (leftColor.alpha() < color && rightColor.alpha() > color){
+            } else if (leftColor.alpha() < color && rightColor.alpha() > color) {
                 leftFront.setPower(power + 0.1);
                 leftRear.setPower(-power + 0.1);
                 rightFront.setPower(-power);
@@ -426,7 +441,7 @@ public class Thunderbot
         stop();
     }
 
-    public void gyroDriveToLine (int color, double power){
+    public void gyroDriveToLine(int color, double power) {
 
         // Creation of speed doubles
         double leftFrontSpeed;
@@ -437,7 +452,7 @@ public class Thunderbot
         // Gets starting angle and position of encoders
         gyStartAngle = updateHeading();
 
-        while (rightColor.alpha() < color && leftColor.alpha() < color){
+        while (rightColor.alpha() < color && leftColor.alpha() < color) {
             double currentAngle = updateHeading();
             telemetry.addData("current heading", currentAngle);
 
@@ -470,7 +485,7 @@ public class Thunderbot
     }
 
 
-    public void travelToObject (double minDistance, double maxDistance, double power) throws InterruptedException {
+    public void travelToObject(double minDistance, double maxDistance, double power) throws InterruptedException {
         double wobbleAngle = 0.0;
         double currentAngle = updateHeading();
         while (true) {
@@ -480,7 +495,7 @@ public class Thunderbot
                 rightFront.setPower(power);
                 leftRear.setPower(power);
                 rightRear.setPower(power);
-                telemetry.addData("distance",distanceSensor.getDistance(DistanceUnit.INCH));
+                telemetry.addData("distance", distanceSensor.getDistance(DistanceUnit.INCH));
                 telemetry.update();
                 wobbleAngle = updateHeading();
 
@@ -490,7 +505,7 @@ public class Thunderbot
                 rightFront.setPower(-power);
                 leftRear.setPower(power);
                 rightRear.setPower(-power);
-                telemetry.addData("Current angle",  currentAngle);
+                telemetry.addData("Current angle", currentAngle);
                 telemetry.update();
 
                 // Turn right looking for object
@@ -499,11 +514,11 @@ public class Thunderbot
                 rightFront.setPower(power);
                 leftRear.setPower(-power);
                 rightRear.setPower(power);
-                telemetry.addData("Current angle",  currentAngle);
+                telemetry.addData("Current angle", currentAngle);
                 telemetry.update();
 
                 // When in range grab object
-            }else if (distanceSensor.getDistance(DistanceUnit.INCH) < minDistance) {
+            } else if (distanceSensor.getDistance(DistanceUnit.INCH) < minDistance) {
                 stop();
                 leftClaw.setPosition(0);
                 rightClaw.setPosition(1);
@@ -517,15 +532,17 @@ public class Thunderbot
     }
 
 
-    /** Gyro methods */
+    /**
+     * Gyro methods
+     */
     // Turns for a specific amount of degrees
-    // Note: Negative power = right positive power = left
+    // Note: Negative power = left   positive power = right
     public void gyroTurn(double targetHeading, double power) {
         gyStartAngle = updateHeading();
         double startAngle = gyStartAngle;
 
         // Repeats until current angle (gyStartAngle) reaches targetHeading relative to startAngle
-        while(Math.abs(gyStartAngle-startAngle) < targetHeading) {
+        while (Math.abs(gyStartAngle - startAngle) < targetHeading) {
             leftFront.setPower(power);
             rightFront.setPower(-power);
             leftRear.setPower(power);
@@ -543,7 +560,8 @@ public class Thunderbot
     // Drives in a straight line for a certain distance in inches
     // Note: can't use to go backwards
     double encStartPosition = 0;
-    public void gyroDriveForward (double distance, double power){
+
+    public void gyroDriveForward(double distance, double power) {
 
         // Creation of speed doubles
         double leftFrontSpeed;
@@ -589,7 +607,7 @@ public class Thunderbot
         stop();
     }
 
-    public void gyroDriveBackward (double distance, double power){
+    public void gyroDriveBackward(double distance, double power) {
 
         // creation of speed doubles
         double leftFrontSpeed;
@@ -636,8 +654,30 @@ public class Thunderbot
     }
 
 
+    /**
+     * Just encoder methods
+     */
+
+    public void driveBackwards(double distance, double power) {
+        encStartPosition = leftFront.getCurrentPosition();
+
+        while (leftFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)) { // changed from < to != also added -
+            leftFront.setPower(-power);
+            leftRear.setPower(-power);
+            rightFront.setPower(-power);
+            rightRear.setPower(-power);
+
+            telemetry.addData("leftFront", leftFront.getCurrentPosition());
+            telemetry.addData("rightFront", rightFront.getCurrentPosition());
+            telemetry.addData("leftRear", leftRear.getCurrentPosition());
+            telemetry.addData("rightRear", rightRear.getCurrentPosition());
+            telemetry.update();
+        }
+        stop();
+    }
+
     //
-    public void strafeLeft (double distance, double power) {
+    public void strafeLeft(double distance, double power) {
         encStartPosition = leftFront.getCurrentPosition();
 
         while (leftFront.getCurrentPosition() > (-distance * COUNTS_PER_INCH + encStartPosition)) { // changed from < to != also added -
@@ -655,7 +695,7 @@ public class Thunderbot
         stop();
     }
 
-    public void strafeRight (double distance, double power) {
+    public void strafeRight(double distance, double power) {
         encStartPosition = leftFront.getCurrentPosition();
 
         while (leftFront.getCurrentPosition() < (distance * COUNTS_PER_INCH + encStartPosition)) { // changed from < to != also added -
@@ -672,37 +712,42 @@ public class Thunderbot
         }
         stop();
     }
-    /** Attachment methods*/
+
+    /**
+     * Attachment methods
+     */
 
     // Drops wobble goal
-    public void wobbleDrop (double power) throws InterruptedException {
+    public void wobbleDrop(double power) throws InterruptedException {
         int state = 0;
 
-            switch (state){
+        switch (state) {
 
-                    // lower arm until touchSensor2 is inactive
-                case 0:
-                    while (!touchSensor2.isPressed()){
-                        armMotor.setPower(power);
-                    }
-                    state++;
+            // lower arm until touchSensor2 is inactive
+            case 0:
+                while (!touchSensor2.isPressed()) {
+                    armMotor.setPower(power);
+                }
+                state++;
 
-                    // stop arm and stop servoHold
-                case 1:
-                    armMotor.setPower(0);
-                    state++;
+                // stop arm and stop servoHold
+            case 1:
+                armMotor.setPower(0);
+                state++;
 
-                    // open claw
-                case 2:
-                    leftClaw.setPosition(0.5);
-                    rightClaw.setPosition(0.5);
-                    state++;
+                // open claw
+            case 2:
+                leftClaw.setPosition(0.5);
+                rightClaw.setPosition(0.5);
+                state++;
 
         }
     }
 
 
-    /** Other methods */
+    /**
+     * Other methods
+     */
 
     // Gets the current angle of the robot
     public double updateHeading() {
@@ -712,7 +757,7 @@ public class Thunderbot
 
 
     // Resets all encoders
-    public void resetEncoders(){
+    public void resetEncoders() {
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -728,10 +773,12 @@ public class Thunderbot
         rightRear.setPower(0);
     }
 
-    /** Unused methods*/
+    /**
+     * Unused methods
+     */
 
     // Grab rings and move rings to ramp
-    public void intakeRings (double timeoutS){
+    public void intakeRings(double timeoutS) {
         while (runtime.seconds() < timeoutS) {
             intake.setPower(1.0);
             intakeServo.setPower(-1.0);
@@ -741,7 +788,7 @@ public class Thunderbot
 
     // Checks if the robot is busy
     public boolean isBusy() {
-        return leftFront.isBusy() && rightFront.isBusy()  && leftRear.isBusy() && rightRear.isBusy();
+        return leftFront.isBusy() && rightFront.isBusy() && leftRear.isBusy() && rightRear.isBusy();
     }
 
 
@@ -755,8 +802,8 @@ public class Thunderbot
         resetEncoders();
 
         // Convert chosen distance from inches to motor ticks and set each motor to the new target
-        newLeftTarget = leftRear.getCurrentPosition() + (int)(lDistance * COUNTS_PER_INCH);
-        newRightTarget = rightRear.getCurrentPosition() + (int)(rDistance * COUNTS_PER_INCH);
+        newLeftTarget = leftRear.getCurrentPosition() + (int) (lDistance * COUNTS_PER_INCH);
+        newRightTarget = rightRear.getCurrentPosition() + (int) (rDistance * COUNTS_PER_INCH);
         leftFront.setTargetPosition(newLeftTarget);
         rightFront.setTargetPosition(newRightTarget);
         leftRear.setTargetPosition(newLeftTarget);
@@ -794,15 +841,15 @@ public class Thunderbot
 
     // Strafes using Mecanum wheels
     // Note: Negative power and distance goes right. Positive power and distance goes left
-    public void strafe2 (double distance, double power){
+    public void strafe2(double distance, double power) {
         int newTarget1;
         int newTarget2;
 
         resetEncoders();
 
         // Convert chosen distance from inches to motor ticks and set each motor to the new target
-        newTarget1 = leftRear.getCurrentPosition() + (int)(distance * COUNTS_PER_INCH);
-        newTarget2 = rightRear.getCurrentPosition() + (int)(distance * COUNTS_PER_INCH);
+        newTarget1 = leftRear.getCurrentPosition() + (int) (distance * COUNTS_PER_INCH);
+        newTarget2 = rightRear.getCurrentPosition() + (int) (distance * COUNTS_PER_INCH);
         leftFront.setTargetPosition(-newTarget2);
         rightFront.setTargetPosition(newTarget1);
         leftRear.setTargetPosition(newTarget1);
@@ -838,15 +885,17 @@ public class Thunderbot
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    /** Target zone methods */
+    /**
+     * Target zone methods
+     */
     public void powerShot() throws InterruptedException {
         shooterMotor.setPower(0.60); // Start up shooterMotors
         shooterMotor2.setPower(0.60);
 
         gyroDriveForward(58, 0.6); // Go forward 70 inches to line up on the shooting line (could change)
-        gyroDriveToLine (120, 0.2 );
+        gyroDriveToLine(120, 0.2);
 
-        lineFollowLeft(190, 20, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
+        lineFollowLeft(190, 22, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
 
         sleep(2000); // Wait 2 secs to allow the rings to reach full power
         shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
@@ -863,7 +912,7 @@ public class Thunderbot
         shooterServo2.setPower(-1.0);
         sleep(2500); // Wait 3 secs to allow all the rings to fire
 
-        lineFollowRight(190, 45, 0.4);      // Changed from 39
+        lineFollowRight(190, 43, 0.4);      // Changed from 39
 
         shooterMotor.setPower(0); // Turn off shooterMotors and shooterServos to conserve power
         shooterMotor2.setPower(0);
@@ -872,24 +921,22 @@ public class Thunderbot
         rampIntakeServo.setPower(0);
     }
 
-
-
-    public void targetZoneA () throws InterruptedException {
+    public void targetZoneA() throws InterruptedException {
         gyroTurn(73, -0.2); // turn 90
 
-        gyroDriveForward(10,0.5);// drive forward to square A
+        gyroDriveForward(10, 0.5);// drive forward to square A
 
         wobbleDrop(0.7); // Drop the wobble goal in the square A
 
-        gyroDriveBackward(15, 0.5);// go backward the same amount as previously going forward
+        gyroDriveBackward(12, 0.5);// go backward the same amount as previously going forward
 
         strafeRight(90, 0.7); // strafe into wall  // May need to reduce the distance a bit
 
         strafeLeftToObject(3, 20, 0.1); // look for and grab wobble
 
-        gyroDriveToLine (110, 0.2 );
+        gyroDriveToLine(110, 0.25);
 
-        strafeLeft(65, 0.5); // get to the white line
+        strafeLeft(65, 0.7); // get to the white line
     }
 
     public void targetZoneB() throws InterruptedException {
@@ -899,62 +946,42 @@ public class Thunderbot
 
         gyroTurn(73, -0.2); // turn 73 degrees right
 
-        strafeRight(94, 0.7); // strafe into wall   // changed from 0.6
+        strafeRight(85, 0.7); // strafe into wall   // changed from 0.6
 
-        gyroDriveForward(10, 0.5);
+        gyroDriveForward(8, 0.5);
 
         strafeLeftToObject(3, 20, 0.1); // look for and grab wobble
-
-        //gyroDriveToLine (110, 0.2 );
-        //maybe go backwards
 
         strafeLeft(70, 0.5); // get to the white line
 
         gyroTurn(80, 1.0);
 
-        gyroDriveForward(10,0.5);
+        gyroDriveForward(10, 0.5);
     }
 
     public void targetZoneC() throws InterruptedException {
-        /*lineFollowRight(190, 21, 0.4);    // hit the wall
+        lineFollowRight(190, 28, 0.4); // hit the wall
 
-        gyroDriveForward(70, 0.5); // Go forward high power to square C
-        // maybe look for blue line on square C
-        // maybe turn to place more out of the way
-        wobbleDrop(0.7); // Drop the wobble goal in the square B
-        //go backwards fast
-        // then look for white line either using gyroDriveToLine or a new method going backwards
-        // lineFollowLeft
+        gyroDriveForward(28, 1.0); // Go forward high power to square C
+        gyroDriveToLine(100, 0.2); // Drive to blue line
 
-        gyroTurn(73, -0.2); // turn 90
+        wobbleDrop(0.7); // Drop the wobble goal in the square C
+        sleep(250);
 
-        strafeRight(90, 0.7); // strafe into wall   // Maybe lower the distance more
+        driveBackwards(38, 1.0); // Drive back past the white line // increase speed if time is needed
+        sleep(500);
+        gyroDriveToLine(120, 0.2); // line up on the white line
 
-        gyroDriveForward(7, 0.5);
+        lineFollowLeft(190, 32, 0.6);
 
-        strafeLeftToObject(3, 20, 0.1); // look for and grab wobble
+        gyroTurn(73, -0.5); // turn 73 degrees right
 
-        gyroDriveToLine (110, 0.2 );
-
-        strafeLeft(70, 0.5);          // get to Square C quickly
-        */
-    }
-
-    public void targetZoneAB() throws InterruptedException {
-        gyroDriveForward(20, 0.5); // Go forward 15 inches into the square B
-
-        wobbleDrop(0.7); // Drop the wobble goal in the square B
-
-        gyroTurn(73, -0.2); // turn 90
-
-        strafeRight(94, 0.7); // strafe into wall   // changed from 0.6
-
-        gyroDriveForward(7, 0.5);
+        strafeRight(70, 1.0); // strafe into wall   // changed from 0.6
 
         strafeLeftToObject(3, 20, 0.1); // look for and grab wobble
 
-        gyroDriveToLine (110, 0.2 );
+        gyroDriveToLine(110, 0.3); // Drive to blue line
 
-        strafeLeft(70, 0.5); // get to the white line
+        strafeLeft(70, 1.0); // get to target zone C fast
     }
 }

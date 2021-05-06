@@ -138,7 +138,6 @@ public class ThunderbotAutoDriveByEncoder_Linear extends LinearOpMode {
             } else {
                 // normal master code or square A
                 robot.powerShot();
-                robot.targetZoneAB();
             }
 
             break;
