@@ -889,9 +889,8 @@ public class Thunderbot {
      * Target zone methods
      */
     public void powerShot() throws InterruptedException {
-        shooterMotor.setPower(0.60); // Start up shooterMotors
-        shooterMotor2.setPower(0.60);
-
+        shooterMotor.setPower(1.0); // Start up shooterMotors
+   
         gyroDriveForward(58, 0.6); // Go forward 70 inches to line up on the shooting line (could change)
         gyroDriveToLine(120, 0.2);
 
@@ -901,6 +900,7 @@ public class Thunderbot {
         shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
         shooterServo2.setPower(-1.0);
         rampIntakeServo.setPower(-0.5);
+        shooterMotor2.setPower(0.3);
         sleep(1000); // Wait 3 secs to allow all the rings to fire
         shooterServo1.setPower(0);
         shooterServo2.setPower(0);
@@ -910,6 +910,7 @@ public class Thunderbot {
         // Note: this time will be able to be reduced if needed
         shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
         shooterServo2.setPower(-1.0);
+        shooterMotor2.setPower(0.3);
         sleep(2500); // Wait 3 secs to allow all the rings to fire
 
         lineFollowRight(190, 43, 0.4);      // Changed from 39
