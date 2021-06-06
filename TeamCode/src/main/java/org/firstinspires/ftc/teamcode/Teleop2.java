@@ -84,21 +84,21 @@ public class  Teleop2 extends OpMode
         }
         //logic for leftFront
         try
-    {
+        {
 
-        leftFront = hardwareMap.dcMotor.get("leftFront");
-        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            leftFront = hardwareMap.dcMotor.get("leftFront");
+            leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
+            leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-    }
-    catch (Exception p_exeception)
-    {
-        leftFront = null;
-    }
+        }
+        catch (Exception p_exeception)
+        {
+            leftFront = null;
+        }
         //logic for leftRear
-       try
+        try
         {
             leftRear = hardwareMap.dcMotor.get("leftRear");
             leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -113,7 +113,7 @@ public class  Teleop2 extends OpMode
         }
 
 
-       //motors
+        //motors
 
         intake = hardwareMap.dcMotor.get("intake");
         intake.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -226,12 +226,12 @@ public class  Teleop2 extends OpMode
 
 //intake
         if (gamepad2.x) {
-             intake.setPower(-1);
+            intake.setPower(-1);
 
         } else {
             intake.setPower(1);
 
-                                }
+        }
 
 //ramp servo
 
@@ -240,33 +240,35 @@ public class  Teleop2 extends OpMode
         }
 
         //Shooter servo kill switch
-        if (gamepad1.dpad_up) {
-            shooterServo1.setPower(0);
-            shooterServo2.setPower(0);
-        }else {
-            shooterServo2.setPower(-1);
-            shooterServo1.setPower(-1);
-        }
 
 
-// gamepad2 controls
+//+ gamepad2 controls
 
 
         //Shooter servo kill switch
         if (gamepad2.dpad_up) {
             shooterServo1.setPower(0);
             shooterServo2.setPower(0);
-        }else {
-            shooterServo2.setPower(-1);
+        } else {
             shooterServo1.setPower(-1);
+            shooterServo2.setPower(-1
+            );
         }
-
 
 
         if (gamepad2.dpad_right) {
             rampIntakeServo.setPower(0);
         }
 
+        if (gamepad2.dpad_right && rampIntakeServo.getPower() == 0) {
+            rampIntakeServo.setPower(-1);
+        }
+
+
+        if (gamepad2.dpad_down) {
+            shooterServo1.setPower(1);
+            shooterServo2.setPower(1);
+        }
 
 
 //arm kill switch
@@ -315,7 +317,7 @@ public class  Teleop2 extends OpMode
 
         if (gamepad2.dpad_left) {
             shooterMotor.setPower(0.8);
-            shooterMotor2.setPower(0.7);
+            shooterMotor2.setPower(0.8);
         } else {
             shooterMotor.setPower(0);
             shooterMotor2.setPower(0);
@@ -324,7 +326,7 @@ public class  Teleop2 extends OpMode
         if (gamepad2.a) {
 
             shooterMotor2.setPower(.8);
-            shooterMotor.setPower(.9);
+            shooterMotor.setPower(.8);
 
         } else {
 
@@ -385,6 +387,6 @@ public class  Teleop2 extends OpMode
         telemetry.addData("ry: ", gamepad1.right_stick_y);
 
         telemetry.update();
-        
+
     }
 }
