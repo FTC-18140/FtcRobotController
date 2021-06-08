@@ -120,10 +120,14 @@ public class  Teleop2 extends OpMode
         intake.setPower(1);
 
         shooterMotor2 = hardwareMap.dcMotor.get("shooterMotor2");
+        shooterMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooterMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooterMotor2.setDirection(DcMotorSimple.Direction.FORWARD);
         shooterMotor2.setPower(0);
 
         shooterMotor = hardwareMap.dcMotor.get("shooterMotor");
+        shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooterMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         shooterMotor.setPower(0);
 
@@ -274,17 +278,6 @@ public class  Teleop2 extends OpMode
 
 //shooting button
 
-        if (gamepad1.a) {
-
-            shooterMotor2.setPower(.8);
-            shooterMotor.setPower(1);
-
-        } else {
-
-            shooterMotor2.setPower(0);
-            shooterMotor.setPower(0);
-
-        }
 
 
         //arm claw controls
@@ -306,8 +299,8 @@ public class  Teleop2 extends OpMode
 
         if (gamepad2.a) {
 
-            shooterMotor2.setPower(.8);
-            shooterMotor.setPower(1);
+            shooterMotor2.setPower(.7); //bottom
+            shooterMotor.setPower(.65);  //top
 
         } else {
 
@@ -315,7 +308,7 @@ public class  Teleop2 extends OpMode
             shooterMotor.setPower(0);
 
         }
-
+/*
         if (gamepad2.dpad_left) {
             shooterMotor.setPower(0.6);
             shooterMotor2.setPower(0.8);
@@ -331,6 +324,7 @@ public class  Teleop2 extends OpMode
             shooterMotor.setPower(0);
             shooterMotor2.setPower(0);
         }
+*/
 
 
         //arm claw controls
@@ -376,12 +370,15 @@ public class  Teleop2 extends OpMode
         leftFront.setPower(mfrontLeft);
         leftRear.setPower(mbackLeft);
 
+
+        telemetry.addData("Shooter power 1 ", shooterMotor.getPowerFloat());
+        telemetry.addData("Shooter power 2", shooterMotor2.getPowerFloat());
         telemetry.addData("lx: ", gamepad1.left_stick_x);
         telemetry.addData("ly: ", gamepad1.left_stick_y);
         telemetry.addData("rx: ", gamepad1.right_stick_x);
         telemetry.addData("ry: ", gamepad1.right_stick_y);
 
         telemetry.update();
-        
+
     }
 }
