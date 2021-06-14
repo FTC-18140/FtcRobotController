@@ -13,18 +13,18 @@ import java.util.List;
 public class BL extends LinearOpMode {
 
     /* Declare OpMode members. */
-    Thunderbot robot = new Thunderbot();   // Use a Thunderbots hardware
+     Thunderbot robot = new Thunderbot();  // Use a Thunderbots hardware
 
     /** Target zone methods for Red Right (RR) */
 
     public void powerShot_BL() throws InterruptedException {
-        robot.shooterMotor.setPower(0.6); // Start up shooterMotors
-        robot.shooterMotor2.setPower(0.6);
+        robot.shooterMotor.setPower(0.55); // Start up shooterMotors
+        robot.shooterMotor2.setPower(0.55);
 
         robot.gyroDriveBackward(3, 0.2); // Get back on the line
-        robot.gyroDriveToLine(300,0.1);
+        robot.gyroDriveToLine(200,0.1);
 
-        robot.lineFollowRight(300, 10, 0.4); // Line follow until the robot is in the position to shoot
+        robot.lineFollowRight(200, 10, 0.4); // Line follow until the robot is in the position to shoot
 
         sleep(2000); // Wait 2 secs to allow the rings to reach full power
         robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
@@ -38,9 +38,13 @@ public class BL extends LinearOpMode {
 
         robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
         robot.shooterServo2.setPower(-1.0);
-        robot.shooterMotor.setPower(0.6);
-        robot.shooterMotor2.setPower(0.6);
+        robot.shooterMotor.setPower(0.55);
+        robot.shooterMotor2.setPower(0.55);
         sleep(3000); // Wait 3 secs to allow all the rings to fire
+
+        robot.gyroDriveToLine(190,0.4);
+
+        robot.strafeRight(10,1.0);
     }
 
 
@@ -48,7 +52,7 @@ public class BL extends LinearOpMode {
         robot.gyroDriveForward(58, 0.6); // Go forward to line up on the shooting line
         robot.gyroDriveToLine(120, 0.2);
 
-        robot.gyroTurn(85, 0.2); // turn 90
+        robot.gyroTurn(25, 0.2); // turn toward target zone   was 85
 
         robot.wobbleDrop(0.7); // Drop the wobble in target zone A
         sleep(250);
@@ -57,7 +61,7 @@ public class BL extends LinearOpMode {
         sleep(1000);
         robot.armMotor.setPower(0);
 
-        robot.gyroTurn(85, -0.2); // turn 90
+        robot.gyroTurn(25, -0.2); // turn towards target zone
     }
 
 
@@ -67,7 +71,7 @@ public class BL extends LinearOpMode {
 
         robot.gyroDriveForward(20, 0.5); // Go forward into target zone B
 
-        robot.strafeRight(10,0.4); // Strafe right
+        robot.strafeRight(14,0.4); // Strafe right
 
         robot.wobbleDrop(0.7); // Drop the wobble goal into target zone B
         sleep(250);
@@ -76,9 +80,10 @@ public class BL extends LinearOpMode {
         sleep(1000);
         robot.armMotor.setPower(0);
 
-        robot.strafeLeft(10,0.4); // Position robot for power shot method
-
         robot.gyroDriveBackward(24, 0.5); // Get back to the white line
+
+        robot.strafeLeft(14,0.4); // Position robot for power shot method
+
         robot.gyroDriveToLine(190, 0.2);
     }
 
@@ -87,7 +92,7 @@ public class BL extends LinearOpMode {
         robot.gyroDriveForward(58, 0.6); // Go forward to line up on the shooting line
         robot.gyroDriveToLine(120, 0.2);
 
-        robot.lineFollowLeft(300, 15, 0.4); // Hit the wall
+        robot.lineFollowLeft(200, 15, 0.4); // Hit the wall
 
         robot.gyroDriveForward(28, 1.0); // Go forward high power to square C
         robot.gyroDriveToLine(100, 0.2); // Drive to blue line
@@ -105,7 +110,7 @@ public class BL extends LinearOpMode {
         sleep(500);
         robot.gyroDriveToLine(120, 0.2); // Line up on the white line
 
-        robot.lineFollowRight(300, 15, 0.4); // Get to target zone B end point
+        robot.lineFollowRight(200, 15, 0.4); // Get to target zone B end point
     }
 
 

@@ -18,14 +18,18 @@ public class RR extends LinearOpMode {
     /** Target zone methods for Red Right (RR) */
 
     public void powerShot_RR() throws InterruptedException {
-        robot.shooterMotor.setPower(0.6); // Start up shooterMotors
-        robot.shooterMotor2.setPower(0.6);
+        robot.shooterMotor.setPower(0.55); // Start up shooterMotors
+        robot.shooterMotor2.setPower(0.55);
+
+        robot.gyroDriveToLine(200,0.2); // Get back on the line
+
+        robot.lineFollowLeft(200, 25,0.5); // Line up for power shots
 
         robot.gyroDriveToLine(190,0.2); // Get back on the line
 
-        robot.lineFollowLeft(300, 50, 0.4); // Line up for power shots
+        robot.driveBackwards(6, 0.2);
 
-        robot.gyroDriveToLine(190,0.2); // Get back on the line
+        robot.gyroTurn(15, 0.3);
 
         sleep(2000); // Wait 2 secs to allow the rings to reach full power
         robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
@@ -35,14 +39,19 @@ public class RR extends LinearOpMode {
         robot.shooterServo1.setPower(0);
         robot.shooterServo2.setPower(0);
 
-        robot.lineFollowLeft(300, 8, 0.5); // Strafe left in order to line up the robot to fire the rings
+        robot.gyroTurn(2, 0.3);
 
         robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
         robot.shooterServo2.setPower(-1.0);
-        robot.shooterMotor.setPower(0.6);
-        robot.shooterMotor2.setPower(0.6);
+        robot.shooterMotor.setPower(0.55);
+        robot.shooterMotor2.setPower(0.55);
         sleep(3000); // Wait 3 secs to allow all the rings to fire
 
+        robot.gyroTurn(18, -0.3);
+
+        robot.gyroDriveToLine(190, 0.2);
+
+        robot.strafeLeft(5,0.5);
     }
 
 
@@ -60,6 +69,8 @@ public class RR extends LinearOpMode {
         robot.armMotor.setPower(0);
 
         robot.gyroTurn(85, 0.2); // turn 90
+
+        robot.driveBackwards(4,0.2);
     }
 
 
@@ -85,7 +96,7 @@ public class RR extends LinearOpMode {
         robot.gyroDriveForward(58, 0.6); // Go forward to line up on the shooting line
         robot.gyroDriveToLine(120, 0.2);
 
-        robot.lineFollowRight(300, 15, 0.4); // Hit the wall
+        robot.lineFollowRight(200, 15, 0.4); // Hit the wall
 
         robot.gyroDriveForward(28, 1.0); // Go forward high power to square C
         robot.gyroDriveToLine(100, 0.2); // Drive to blue line
@@ -101,7 +112,7 @@ public class RR extends LinearOpMode {
         sleep(500);
         robot.gyroDriveToLine(120, 0.2); // line up on the white line
 
-        robot.lineFollowLeft(300, 15, 0.4); // Get to target zone B end point
+        robot.lineFollowLeft(200, 10, 0.4); // Get to target zone B end point
     }
 
 

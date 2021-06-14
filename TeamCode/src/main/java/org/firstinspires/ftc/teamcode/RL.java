@@ -20,13 +20,16 @@ public class RL extends LinearOpMode {
 
     /** Target zone methods for Red Left (RL) */
     public void powerShot_RL() throws InterruptedException {
-        robot.shooterMotor.setPower(0.6); // Start up shooterMotors
-        robot.shooterMotor2.setPower(0.6);
+        robot.shooterMotor.setPower(0.55); // Start up shooterMotors
+        robot.shooterMotor2.setPower(0.55);
 
         robot.gyroDriveForward(58, 0.6); // Line up on the shooting line
         robot.gyroDriveToLine(120, 0.2);
 
-        robot.lineFollowLeft(300, 25, 0.5); // Strafe left to set up the robot to fire the rings
+        //robot.lineFollowLeft(300, 8, 0.5); // Strafe left to set up the robot to fire the rings
+        robot.driveBackwards(5, 0.2);
+
+        robot.gyroTurn(15, 0.3);
 
         sleep(2000); // Wait 2 secs to allow the rings to reach full power
         robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
@@ -36,15 +39,20 @@ public class RL extends LinearOpMode {
         robot.shooterServo1.setPower(0);
         robot.shooterServo2.setPower(0);
 
-        robot.lineFollowLeft(300, 6, 0.5); // Strafe left to set up the robot to fire the rings
+        robot.gyroTurn(2, 0.3);
+        //robot.lineFollowLeft(300, 6, 0.5); // Strafe left to set up the robot to fire the rings
 
         robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
         robot.shooterServo2.setPower(-1.0);
-        robot.shooterMotor.setPower(0.6);
-        robot.shooterMotor2.setPower(0.6);
+        robot.shooterMotor.setPower(0.55);
+        robot.shooterMotor2.setPower(0.55);
         sleep(3000); // Wait 3 secs to allow all the rings to fire
 
-        robot.lineFollowRight(300, 47, 0.4); // Move into the center of the field
+        robot.gyroTurn(17, -0.3);
+
+        //robot.gyroDriveToLine(190, 0.2);
+
+        robot.lineFollowRight(200, 16, 0.4); // Move into the center of the field
 
         robot.shooterMotor.setPower(0); // Turn off shooterMotors and shooterServos to conserve power (probably unnecessary)
         robot.shooterMotor2.setPower(0);
@@ -66,12 +74,12 @@ public class RL extends LinearOpMode {
         sleep(1000);
         robot.armMotor.setPower(0);
 
-        robot.gyroDriveBackward(40, 0.5); // Move into the center of the field
+        robot.gyroDriveBackward(28, 0.5); // Move into the center of the field
     }
 
 
     public void targetZoneB_RL() throws InterruptedException {
-        robot.gyroDriveForward(20, 0.5); // Go forward to target zone B
+        robot.gyroDriveForward(15, 0.5); // Go forward to target zone B
 
         robot.wobbleDrop(0.7); // Drop the wobble goal into target zone B
         sleep(250);
@@ -81,17 +89,17 @@ public class RL extends LinearOpMode {
         robot.armMotor.setPower(0);
 
         robot.gyroDriveBackward(21, 0.5); // Get back on the line
-        robot.gyroDriveToLine(190, 0.2);
 
-        robot.lineFollowLeft(300, 38, 0.4); // Move into the center of the field
+        robot.gyroDriveToLine(190,0.2);
+
+        robot.lineFollowLeft(200,33,0.4); // Move into the center of the field
     }
 
 
     public void targetZoneC_RL() throws InterruptedException {
-        robot.lineFollowRight(300, 25, 0.4); // Hit the wall
+        robot.lineFollowRight(200, 26, 0.4); // Hit the wall
 
-        robot.gyroDriveForward(28, 1.0); // Go forward high power to square C
-        robot.gyroDriveToLine(100, 0.2); // Drive to blue line
+        robot.gyroDriveForward(34, 1.0); // Go forward high power to square C
 
         robot.wobbleDrop(0.7); // Drop the wobble goal in the square C
         sleep(250);
@@ -104,7 +112,7 @@ public class RL extends LinearOpMode {
         sleep(500);
         robot.gyroDriveToLine(120, 0.2); // Line up on the white line
 
-        robot.lineFollowLeft(300, 50, 0.4); // Move into the center of the field
+        robot.lineFollowLeft(200, 50, 0.4); // Move into the center of the field
     }
 
     @Override

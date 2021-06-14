@@ -20,13 +20,13 @@ public class BR extends LinearOpMode {
     /** Target zone methods for Blue Right (BR) */
 
     public void powerShot_BR() throws InterruptedException {
-        robot.shooterMotor.setPower(0.6); // Start up shooterMotors
-        robot.shooterMotor2.setPower(0.6);
+        robot.shooterMotor.setPower(0.55); // Start up shooterMotors
+        robot.shooterMotor2.setPower(0.55);
 
         robot.gyroDriveForward(58, 0.6); // Go forward 70 inches to line up on the shooting line (could change)
         robot.gyroDriveToLine(120, 0.2);
 
-        robot.lineFollowLeft(300, 3, 0.4);
+        robot.lineFollowLeft(200, 3, 0.4);
 
         sleep(2000); // Wait 2 secs to allow the rings to reach full power
         robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
@@ -37,13 +37,13 @@ public class BR extends LinearOpMode {
         robot.shooterServo1.setPower(0);
         robot.shooterServo2.setPower(0);
 
-        robot.lineFollowLeft(300, 9, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
+        robot.lineFollowLeft(200, 9, 0.5); // Strafe left 10 inches in order to line up the robot to fire the rings
 
         // Note: this time will be able to be reduced if needed
         robot.shooterServo1.setPower(-1.0); // Move rings into shooterMotors to fire rings
         robot.shooterServo2.setPower(-1.0);
-        robot.shooterMotor.setPower(0.6);
-        robot.shooterMotor2.setPower(0.6);
+        robot.shooterMotor.setPower(0.55);
+        robot.shooterMotor2.setPower(0.55);
         sleep(3000); // Wait 3 secs to allow all the rings to fire
 
         robot.gyroDriveForward(2, 0.2);
@@ -70,7 +70,7 @@ public class BR extends LinearOpMode {
         sleep(1000);
         robot.armMotor.setPower(0);
 
-        robot.gyroDriveBackward(45, 0.5);
+        robot.gyroDriveBackward(30, 0.5);
     }
 
 
@@ -84,9 +84,11 @@ public class BR extends LinearOpMode {
         sleep(1000);
         robot.armMotor.setPower(0);
 
+        robot.strafeRight(10,0.5);
+
         robot.gyroDriveBackward(18, 0.5); // Move backwards on the line
 
-        robot.strafeRight(45,0.5); // Move into the center of the field
+        robot.strafeRight(15,0.5); // Move into the center of the field
     }
 
 
@@ -95,19 +97,23 @@ public class BR extends LinearOpMode {
 
         robot.gyroDriveForward(28, 1.0); // Go forward high power into target zone C
         robot.gyroDriveToLine(100, 0.2); // Drive to blue line
+        robot.gyroDriveForward(4, 0.2);
 
         robot.wobbleDrop(0.7); // Drop the wobble goal in the square C
         sleep(250);
 
+
+        robot.leftClaw.setPosition(0);
+        robot.rightClaw.setPosition(1);
         robot.armMotor.setPower(-0.7); // Raise the wobble arm
         sleep(1000);
         robot.armMotor.setPower(0);
 
-        robot.driveBackwards(38, 1.0); // Drive back past the white line
+        robot.driveBackwards(42, 1.0); // Drive back past the white line
         sleep(500);
         robot.gyroDriveToLine(190, 0.2); // line up on the white line
 
-        robot.lineFollowRight(300, 50, 0.4); // Move into the center of the field
+        robot.strafeRight(50, 0.4); // Move into the center of the field
     }
 
 
