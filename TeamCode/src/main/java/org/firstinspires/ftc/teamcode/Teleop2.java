@@ -302,8 +302,8 @@ public class  Teleop2 extends OpMode
 
         if (gamepad2.a) {
 
-            shooterMotor2.setPower(.7);
-            shooterMotor.setPower(.65);
+            shooterMotor2.setPower(.6);
+            shooterMotor.setPower(.5);
 
         } else {
 
