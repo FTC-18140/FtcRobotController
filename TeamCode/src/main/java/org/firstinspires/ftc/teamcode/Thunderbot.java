@@ -269,6 +269,15 @@ public class Thunderbot {
 
 
     /** Methods */
+    // Moves forward
+    public void move() throws InterruptedException {
+        rightFront.setPower(.5);
+        leftFront.setPower(.5);
+        rightRear.setPower(.5);
+        leftRear.setPower(.5);
+        sleep(2500);
+        stop();
+    }
 
     // Gets the current angle of the robot
     public double updateHeading() {
